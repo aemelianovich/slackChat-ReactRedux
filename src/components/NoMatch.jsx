@@ -4,7 +4,7 @@ import React from 'react';
 // @ts-ignore
 import NoMatchImage from '../../assets/images/404Image.png';
 
-export const NoMatch = () => (
+export const NoMatch = (props) => (
     <div className="container-fluid h-100">
         <div className="row justify-content-center align-content-center h-100">
             <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">

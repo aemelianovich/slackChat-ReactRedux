@@ -4,11 +4,14 @@ root: true
 
 plugins:
   - functional
+  - react-hooks
+  - react
 
 extends:
   - airbnb
   - "plugin:functional/external-recommended"
   - "plugin:functional/recommended"
+  - "plugin:react/all"
 
 parser: babel-eslint
 
@@ -32,3 +35,7 @@ rules:
   functional/functional-parameters: 0
   functional/no-try-statement: 0
   functional/no-throw-statement: 0
+  react-hooks/rules-of-hooks: 2
+  react-hooks/exhaustive-deps: 1
+  react/jsx-uses-react: 2
+  react/jsx-uses-vars: 2

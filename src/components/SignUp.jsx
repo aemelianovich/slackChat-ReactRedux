@@ -7,19 +7,19 @@ import * as Yup from 'yup';
 import SignUpImage from '../../assets/images/SignUpImage.jpg';
 
 const SignUpSchema = Yup.object().shape({
-    userName: Yup.string()
+    username: Yup.string()
         .required('Обязательное поле')
         .min(6, 'От 3 до 20 символов!')
         .max(20, 'От 3 до 20 символов!'),
     password: Yup.string()
         .required('Обязательное поле') 
         .min(6, 'Не менее 6 символов!'),               
-    confirmPassword: Yup.string()
+    confirmpassword: Yup.string()
     .oneOf([Yup.ref('password'), null], "Пароли должны совпадать"), 
 });
 
 
-export const SignUp = () => (
+export const SignUp = (props) => (
     <div className="container-fluid h-100">
         <div className="row justify-content-center align-content-center h-100">
             <div className="col-12 col-md-8 col-xxl-6">
@@ -30,9 +30,9 @@ export const SignUp = () => (
                         </div>
                         <Formik
                             initialValues={{
-                                userName: '',
+                                username: '',
                                 password: '',
-                                confirmPassword: ''
+                                confirmpassword: ''
                             }}
                             validationSchema={SignUpSchema}
                             onSubmit={async (values) => {
@@ -46,12 +46,12 @@ export const SignUp = () => (
                                     <div className="form-floating mb-3 form-group">
                                         <Field 
                                             placeholder="Имя Пользователя" 
-                                            name="userName" 
-                                            autoComplete="userName" 
-                                            required id="userName" 
-                                            className={'form-control' + (errors.userName && touched.userName ? ' is-invalid' : '')} 
+                                            name="username" 
+                                            autoComplete="username" 
+                                            required id="username" 
+                                            className={'form-control' + (errors.username && touched.username ? ' is-invalid' : '')} 
                                         />                                        
-                                        <ErrorMessage name="userName" component="div" className="invalid-feedback" />                                        
+                                        <ErrorMessage name="username" component="div" className="invalid-feedback" />                                        
                                     </div>
                                     <div className="form-floating mb-3 form-group">
                                         <Field 
@@ -70,14 +70,14 @@ export const SignUp = () => (
                                     <div className="form-floating mb-4 form-group">
                                         <Field 
                                             placeholder="Подтвердите пароль" 
-                                            name="confirmPassword" 
+                                            name="confirmpassword" 
                                             required 
                                             autoComplete="new-password" 
                                             type="password" 
-                                            id="confirmPassword" 
-                                            className={'form-control' + (errors.confirmPassword && touched.confirmPassword ? ' is-invalid' : '')}
+                                            id="confirmpassword" 
+                                            className={'form-control' + (errors.confirmpassword && touched.confirmpassword ? ' is-invalid' : '')}
                                         />
-                                        <ErrorMessage name="confirmPassword" component="div" className="invalid-feedback" />                                        
+                                        <ErrorMessage name="confirmpassword" component="div" className="invalid-feedback" />                                        
                                     </div>
                                     <button type="submit"  disabled={isSubmitting} className="w-100 btn btn-outline-primary">Зарегистрироваться</button>                                    
                                 </Form>)}
