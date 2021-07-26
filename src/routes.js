@@ -1,6 +1,6 @@
 // @ts-check
 
-const host = (process.env.NODE_ENV === 'production') ? 'https://ae-chat-slack.herokuapp.com':'http://localhost:5000';
+const host = (process.env.NODE_ENV === 'production') ? 'https://ae-chat-slack.herokuapp.com' : 'http://localhost:5000';
 const prefix = 'api/v1';
 
 export default {
