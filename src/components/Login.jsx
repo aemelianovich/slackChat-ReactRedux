@@ -29,7 +29,6 @@ const Login = (props) => {
                 }}
                 onSubmit={async (values, { setErrors }) => {
                   try {
-                    // await new Promise((r) => setTimeout(r, 1));
                     const data = {
                       username: values.username,
                       password: values.password,
@@ -44,11 +43,36 @@ const Login = (props) => {
                     setUser({ username: response.data.username, token: response.data.token });
                     props.history.push('/');
                   } catch (error) {
-                    setErrors({ username: 'Неверное имя пользователя или пароль', password: 'Неверное имя пользователя или пароль' });
-                    // alert(JSON.stringify(error, null, 2));
-                    console.log(error);
+                    if (error.response) {
+                      if (error.response.status === 401) {
+                        setErrors({
+                          username: ' ',
+                          password: 'Неверное имя пользователя или пароль',
+                        });
+                      } else {
+                        setErrors({
+                          username: ' ',
+                          password: 'Свяжитесь с администратором',
+                        });
+                      }
+                      console.log(error.response);
+                    } else if (error.request) {
+                      setErrors({
+                        username: ' ',
+                        password: 'Свяжитесь с администратором',
+                      });
+                      console.log(error.request);
+                    } else {
+                      setErrors({
+                        username: ' ',
+                        password: 'Свяжитесь с администратором',
+                      });
+
+                      console.log(error);
+                    }
                   }
                 }}
+
               >
                 {({ isSubmitting, errors, touched }) => (
                   <Form className="col-12 col-md-6 mt-3 mt-mb-0">

@@ -13,8 +13,6 @@ const getUser = () => {
 
 const UserContextProvider = (props) => {
   const [user, setUser] = useState(getUser());
-  const { children } = props.children;
-
   const value = useMemo(() => ({ user, setUser }), [user, setUser]);
 
   useEffect(() => {
@@ -23,7 +21,7 @@ const UserContextProvider = (props) => {
 
   return (
     <UserContext.Provider value={value}>
-      { children }
+      { props.children }
     </UserContext.Provider>
   );
 };
