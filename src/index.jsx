@@ -6,14 +6,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import '../assets/application.scss';
-import { App } from './components/App.jsx';
-
+import App from './components/App.jsx';
 
 if (process.env.NODE_ENV !== 'production') {
   localStorage.debug = 'chat:*';
 }
 
 ReactDOM.render(
-  <App />, 
-  document.querySelector('#chat')
+  <App />,
+  document.querySelector('#chat'),
 );
