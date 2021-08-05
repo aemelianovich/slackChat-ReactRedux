@@ -1,15 +1,31 @@
 // @ts-check
 
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useGetChatDataQuery } from '../app/services/chatApi.js';
+import { UserContext } from './UserContext.jsx';
+import { actions } from '../app/slices';
+import Channels from './Channels.jsx';
+import Messages from './Messages.jsx';
 
-const Chat = () => (
-  <div className="container-fluid h-100">
-    <div className="row justify-content-center align-content-center h-100">
-      <div className="col-12 col-md-8 col-xxl-6">
-        <h1 className="text-center mb-4">ЭТО ЧАТ</h1>
+const Chat = () => {
+  const { user } = useContext(UserContext);
+  const dispatch = useDispatch();
+  const { data } = useGetChatDataQuery(user);
+
+  useEffect(() => {
+    if (data) {
+      dispatch(actions.initChatData(data));
+    }
+  }, [data, dispatch]);
+
+  return (
+    <div className="container h-100 my-4 overflow-hidden rounded shadow">
+      <div className="row h-100 bg-white flex-md-row">
+        <Channels />
+        <Messages />
       </div>
     </div>
-  </div>
-);
-
+  );
+};
 export default Chat;

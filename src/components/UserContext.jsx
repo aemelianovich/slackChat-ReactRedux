@@ -1,7 +1,7 @@
 // @ts-check
 
 import React, {
-  createContext, useEffect, useState, useMemo,
+  createContext, useEffect, useState,
 } from 'react';
 
 export const UserContext = createContext(null);
@@ -13,14 +13,13 @@ const getUser = () => {
 
 const UserContextProvider = (props) => {
   const [user, setUser] = useState(getUser());
-  const value = useMemo(() => ({ user, setUser }), [user, setUser]);
 
   useEffect(() => {
     localStorage.setItem('user', JSON.stringify(user));
   }, [user]);
 
   return (
-    <UserContext.Provider value={value}>
+    <UserContext.Provider value={{ user, setUser }}>
       { props.children }
     </UserContext.Provider>
   );

@@ -10,12 +10,27 @@ const getNextId = () => Number(_.uniqueId());
 const buildState = (defaultState) => {
   const generalChannelId = getNextId();
   const randomChannelId = getNextId();
+  const messageId1 = getNextId();
+  const messageId2 = getNextId();
   const state = {
     channels: [
       { id: generalChannelId, name: 'general', removable: false },
       { id: randomChannelId, name: 'random', removable: false },
     ],
-    messages: [],
+    messages: [
+      {
+        body: 'Welcome to our Chat.',
+        channelId: generalChannelId,
+        username: 'ghost',
+        id: messageId1,
+      },
+      {
+        body: 'Hi there.',
+        channelId: generalChannelId,
+        username: 'admin',
+        id: messageId2,
+      },
+    ],
     currentChannelId: generalChannelId,
     users: [
       { id: 1, username: 'admin', password: 'admin' },
