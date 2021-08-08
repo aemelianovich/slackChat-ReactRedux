@@ -1,11 +1,11 @@
 // @ts-check
 
-import React, { useContext } from 'react';
+import React from 'react';
 import { Button } from 'react-bootstrap';
-import { UserContext } from './UserContext.jsx';
+import { useUserContext } from './UserContext.jsx';
 
 const NavBar = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser } = useUserContext();
 
   const handleClick = (e) => {
     e.preventDefault();

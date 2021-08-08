@@ -9,6 +9,7 @@ export const rtkRoutes = {
 };
 
 export default {
+  host,
   channelsPath: () => [host, prefix, 'channels'].join('/'),
   channelPath: (id) => [host, prefix, 'channels', id].join('/'),
   channelMessagesPath: (id) => [host, prefix, 'channels', id, 'messages'].join('/'),

@@ -1,17 +1,17 @@
 // @ts-check
 
-import React, { useContext } from 'react';
+import React from 'react';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
-import { UserContext } from './UserContext.jsx';
+import { useUserContext } from './UserContext.jsx';
 import routes from '../routes.js';
 // @ts-ignore
 import LoginChatImage from '../../assets/images/loginChat.jpg';
 
 const Login = (props) => {
-  const { setUser } = useContext(UserContext);
+  const { setUser } = useUserContext();
 
   return (
     <div className="container-fluid h-100">

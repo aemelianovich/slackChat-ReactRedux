@@ -1,6 +1,7 @@
 // @ts-check
 
 import React from 'react';
+import { Container } from 'react-bootstrap';
 import {
   BrowserRouter,
   Switch,
@@ -13,20 +14,23 @@ import NavBar from './NavBar.jsx';
 import Chat from './Chat.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
 import UserContextProvider from './UserContext.jsx';
+import SocketContextProvider from './SocketContext.jsx';
 
 const App = () => (
   <BrowserRouter>
-    <div className="d-flex flex-column h-100">
+    <Container className="d-flex flex-column h-100">
       <UserContextProvider>
-        <NavBar />
-        <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={SignUp} />
-          <PrivateRoute exact path="/" component={Chat} />
-          <Route path="*" component={NoMatch} />
-        </Switch>
+        <SocketContextProvider>
+          <NavBar />
+          <Switch>
+            <Route path="/login" component={Login} />
+            <Route path="/signup" component={SignUp} />
+            <PrivateRoute exact path="/" component={Chat} />
+            <Route path="*" component={NoMatch} />
+          </Switch>
+        </SocketContextProvider>
       </UserContextProvider>
-    </div>
+    </Container>
   </BrowserRouter>
 );
 

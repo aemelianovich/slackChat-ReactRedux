@@ -1,9 +1,10 @@
 import channelsReducer, { initChatData, setCurrentChannelId } from './channelsSlice';
-import messagesReducer from './messagesSlice';
+import messagesReducer, { addMessage } from './messagesSlice';
 
 const actions = {
   initChatData,
   setCurrentChannelId,
+  addMessage,
 };
 
 export { channelsReducer, messagesReducer, actions };

@@ -9,7 +9,11 @@ const initialState = {
 export const messagesSlice = createSlice({
   name: 'messagesInfo',
   initialState,
-  reducers: {},
+  reducers: {
+    addMessage: (state, action) => {
+      state.messages.push(action.payload.newMessage);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(initChatData, (state, action) => {
@@ -17,6 +21,9 @@ export const messagesSlice = createSlice({
       });
   },
 });
+
+// Action creators are generated for each case reducer function
+export const { addMessage } = messagesSlice.actions;
 
 export const selectChannelMessages = (state) => {
   if (!state.channelsInfo.currentChannelId) {

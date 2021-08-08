@@ -1,20 +1,20 @@
 // @ts-check
 
-import React, { useContext } from 'react';
+import React from 'react';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 import routes from '../routes.js';
-import { UserContext } from './UserContext.jsx';
+import { useUserContext } from './UserContext.jsx';
 // @ts-ignore
 import SignUpImage from '../../assets/images/SignUpImage.jpg';
 
 const SignUpSchema = Yup.object().shape({
   username: Yup.string()
     .required('Обязательное поле')
-    .min(6, 'От 3 до 20 символов!')
+    .min(3, 'От 3 до 20 символов!')
     .max(20, 'От 3 до 20 символов!'),
   password: Yup.string()
     .required('Обязательное поле')
@@ -24,7 +24,7 @@ const SignUpSchema = Yup.object().shape({
 });
 
 const SignUp = (props) => {
-  const { setUser } = useContext(UserContext);
+  const { setUser } = useUserContext();
 
   return (
     <div className="container-fluid h-100">
