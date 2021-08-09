@@ -15,7 +15,7 @@ import './i18n';
 export default (socket) => {
   const sendMessage = (message) => (
     new Promise((resolve, reject) => {
-      if (socket) {
+      if (!socket) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject('No socket connection.');
       } else {
