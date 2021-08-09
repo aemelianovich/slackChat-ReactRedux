@@ -21,11 +21,11 @@ const Chat = () => {
   }, [data, dispatch]);
 
   return (
-    <Container className="container h-100 my-4 overflow-hidden rounded shadow">
-      <Container className="row h-100 bg-white flex-md-row">
+    <Container className="h-100 my-4 overflow-hidden rounded shadow">
+      <div className="row h-100 bg-white flex-md-row">
         <Channels />
         <Messages />
-      </Container>
+      </div>
     </Container>
   );
 };

@@ -5,6 +5,7 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import { useUserContext } from './UserContext.jsx';
 import routes from '../routes.js';
 // @ts-ignore
@@ -12,6 +13,7 @@ import LoginChatImage from '../../assets/images/loginChat.jpg';
 
 const Login = (props) => {
   const { setUser } = useUserContext();
+  const { t } = useTranslation();
 
   return (
     <div className="container-fluid h-100">
@@ -20,7 +22,7 @@ const Login = (props) => {
           <div className="card shadow-sm">
             <div className="card-body row p-5">
               <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-                <img src={LoginChatImage} className="rounded-circle" alt="Войти" />
+                <img src={LoginChatImage} className="rounded-circle" alt={t('login.enter')} />
               </div>
               <Formik
                 initialValues={{
@@ -47,25 +49,25 @@ const Login = (props) => {
                       if (error.response.status === 401) {
                         setErrors({
                           username: ' ',
-                          password: 'Неверное имя пользователя или пароль',
+                          password: t('errors.password'),
                         });
                       } else {
                         setErrors({
                           username: ' ',
-                          password: 'Свяжитесь с администратором',
+                          password: t('errors.generic'),
                         });
                       }
                       console.log(error.response);
                     } else if (error.request) {
                       setErrors({
                         username: ' ',
-                        password: 'Свяжитесь с администратором',
+                        password: t('errors.generic'),
                       });
                       console.log(error.request);
                     } else {
                       setErrors({
                         username: ' ',
-                        password: 'Свяжитесь с администратором',
+                        password: t('errors.generic'),
                       });
 
                       console.log(error);
@@ -76,13 +78,13 @@ const Login = (props) => {
               >
                 {({ isSubmitting, errors, touched }) => (
                   <Form className="col-12 col-md-6 mt-3 mt-mb-0">
-                    <h1 className="text-center mb-4">Войти</h1>
+                    <h1 className="text-center mb-4">{t('login.enter')}</h1>
                     <div className="form-floating mb-3 form-group">
                       <Field
                         name="username"
                         autoComplete="username"
                         required
-                        placeholder="Ваш ник"
+                        placeholder={t('login.username')}
                         id="username"
                         className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                       />
@@ -92,23 +94,23 @@ const Login = (props) => {
                         name="password"
                         autoComplete="current-password"
                         required
-                        placeholder="Пароль"
+                        placeholder={t('login.password')}
                         type="password"
                         id="password"
                         className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                       />
                       <ErrorMessage name="password" component="div" className="invalid-feedback" />
                     </div>
-                    <button type="submit" disabled={isSubmitting} className="w-100 mb-3 btn btn-outline-primary">Войти</button>
+                    <button type="submit" disabled={isSubmitting} className="w-100 mb-3 btn btn-outline-primary">{t('login.enter')}</button>
                   </Form>
                 )}
               </Formik>
             </div>
             <div className="card-footer p-4">
               <div className="text-center">
-                <span>Нет аккаунта?</span>
+                <span>{t('login.noUsername')}</span>
                 {' '}
-                <a href="/signup">Регистрация</a>
+                <a href="/signup">{t('login.registration')}</a>
               </div>
             </div>
           </div>

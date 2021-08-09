@@ -6,25 +6,27 @@ import {
 } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import routes from '../routes.js';
 import { useUserContext } from './UserContext.jsx';
 // @ts-ignore
 import SignUpImage from '../../assets/images/SignUpImage.jpg';
 
-const SignUpSchema = Yup.object().shape({
-  username: Yup.string()
-    .required('Обязательное поле')
-    .min(3, 'От 3 до 20 символов!')
-    .max(20, 'От 3 до 20 символов!'),
-  password: Yup.string()
-    .required('Обязательное поле')
-    .min(6, 'Не менее 6 символов!'),
-  confirmpassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Пароли должны совпадать'),
-});
-
 const SignUp = (props) => {
   const { setUser } = useUserContext();
+  const { t } = useTranslation();
+
+  const SignUpSchema = Yup.object().shape({
+    username: Yup.string()
+      .required(t('signUp.requiredField'))
+      .min(3, t('signUp.usernameLength'))
+      .max(20, t('signUp.usernameLength')),
+    password: Yup.string()
+      .required(t('signUp.requiredField'))
+      .min(6, t('signUp.passwordLength')),
+    confirmpassword: Yup.string()
+      .oneOf([Yup.ref('password'), null], t('signUp.identicalPassword')),
+  });
 
   return (
     <div className="container-fluid h-100">
@@ -33,7 +35,7 @@ const SignUp = (props) => {
           <div className="card shadow-sm">
             <div className="card-body d-flex flex-column flex-md-row justify-content-around align-items-center p-5">
               <div>
-                <img src={SignUpImage} className="rounded-circle" alt="Регистрация" />
+                <img src={SignUpImage} className="rounded-circle" alt={t('signUp.title')} />
               </div>
               <Formik
                 initialValues={{
@@ -63,13 +65,13 @@ const SignUp = (props) => {
                         setErrors({
                           username: ' ',
                           password: ' ',
-                          confirmpassword: 'Такой пользователь уже существует',
+                          confirmpassword: t('errors.existingUser'),
                         });
                       } else {
                         setErrors({
                           username: ' ',
                           password: ' ',
-                          confirmpassword: 'Свяжитесь с администратором',
+                          confirmpassword: t('errors.generic'),
                         });
                       }
                       console.log(error.response);
@@ -77,14 +79,14 @@ const SignUp = (props) => {
                       setErrors({
                         username: ' ',
                         password: ' ',
-                        confirmpassword: 'Свяжитесь с администратором',
+                        confirmpassword: t('errors.generic'),
                       });
                       console.log(error.request);
                     } else {
                       setErrors({
                         username: ' ',
                         password: ' ',
-                        confirmpassword: 'Свяжитесь с администратором',
+                        confirmpassword: t('errors.generic'),
                       });
 
                       console.log(error);
@@ -96,10 +98,10 @@ const SignUp = (props) => {
                   isSubmitting, errors, touched,
                 }) => (
                   <Form className="w-50">
-                    <h1 className="text-center mb-4">Регистрация</h1>
+                    <h1 className="text-center mb-4">{t('signUp.title')}</h1>
                     <div className="form-floating mb-3 form-group">
                       <Field
-                        placeholder="Имя Пользователя"
+                        placeholder={t('signUp.username')}
                         name="username"
                         autoComplete="username"
                         required
@@ -110,7 +112,7 @@ const SignUp = (props) => {
                     </div>
                     <div className="form-floating mb-3 form-group">
                       <Field
-                        placeholder="Пароль"
+                        placeholder={t('signUp.password')}
                         name="password"
                         aria-describedby="passwordHelpBlock"
                         required
@@ -124,7 +126,7 @@ const SignUp = (props) => {
                     </div>
                     <div className="form-floating mb-4 form-group">
                       <Field
-                        placeholder="Подтвердите пароль"
+                        placeholder={t('signUp.confirmPassword')}
                         name="confirmpassword"
                         required
                         autoComplete="new-password"
@@ -134,7 +136,9 @@ const SignUp = (props) => {
                       />
                       <ErrorMessage name="confirmpassword" component="div" className="invalid-feedback" />
                     </div>
-                    <button type="submit" disabled={isSubmitting} className="w-100 btn btn-outline-primary">Зарегистрироваться</button>
+                    <button type="submit" disabled={isSubmitting} className="w-100 btn btn-outline-primary">
+                      {t('signUp.register')}
+                    </button>
                   </Form>
                 )}
               </Formik>

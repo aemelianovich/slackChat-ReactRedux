@@ -66,9 +66,12 @@ export default (app, defaultState = {}) => {
         ...message,
         id: getNextId(),
       };
-      state.messages.push(messageWithId);
-      acknowledge({ status: 'ok' });
-      app.io.emit('newMessage', messageWithId);
+
+      setTimeout(() => {
+        state.messages.push(messageWithId);
+        acknowledge({ status: 'ok' });
+        app.io.emit('newMessage', messageWithId);
+      }, 6000);
     });
 
     socket.on('newChannel', (channel, acknowledge = _.noop) => {
