@@ -1,6 +1,6 @@
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/no-class */
-import i18n from '../i18n';
+import i18n from 'i18next';
 
 class TimeoutError extends Error {
   constructor() {

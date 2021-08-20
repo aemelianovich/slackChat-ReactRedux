@@ -4,6 +4,9 @@ import 'core-js/stable/index.js';
 import 'regenerator-runtime/runtime.js';
 import React from 'react';
 import { Provider } from 'react-redux';
+import io from 'socket.io-client';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
 import '../assets/application.scss';
 import App from './components/App.jsx';
@@ -12,17 +15,34 @@ import { SocketContext } from './components/SocketContext.jsx';
 import { actions } from './app/slices/index';
 import TimeoutError from './errors/TimeoutError';
 import SocketConnectionError from './errors/SocketConnectionError';
-import './i18n';
+import routes from './routes';
+import resources from './locales';
 
-const socketTimeout = 9000000000000;
-const emitTypes = {
-  newMessage: 'newMessage',
-  newChannel: 'newChannel',
-  renameChannel: 'renameChannel',
-  removeChannel: 'removeChannel',
-};
+export default () => {
+  // ////////////////// //
+  // Init localization  //
+  // ////////////////// //
+  i18n
+    .use(initReactI18next)
+    .init({
+      lng: 'ru',
+      debug: !(process.env.NODE_ENV === 'production'),
+      resources,
+    });
 
-export default (socket) => {
+  // ////////////////// //
+  // Init socket        //
+  // ////////////////// //
+  const socket = io(routes.host);
+  const socketTimeout = 9000;
+
+  const emitTypes = {
+    newMessage: 'newMessage',
+    newChannel: 'newChannel',
+    renameChannel: 'renameChannel',
+    removeChannel: 'removeChannel',
+  };
+
   const emitMessage = (emitType, data, timeout = socketTimeout) => (
     new Promise((resolve, reject) => {
       if (!socket) {
@@ -73,6 +93,9 @@ export default (socket) => {
     store.dispatch(actions.removeChannel({ channelId: data.id }));
   });
 
+  // ////////////////// //
+  // Init App           //
+  // ////////////////// //
   return (
     <SocketContext.Provider value={{ emitMessage, emitTypes }}>
       <Provider store={store}>
