@@ -1,5 +1,3 @@
-// @ts-check
-
 import React, { useEffect, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -10,31 +8,31 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { selectCurrentChannelInfo } from '../app/slices/channelsSlice';
+import { selectCurrentChannelInfo, selectCurrentChannelId } from '../app/slices/channelsSlice';
 import { selectChannelMessages } from '../app/slices/messagesSlice';
 import { useUserContext } from './UserContext.jsx';
 import { SocketContext } from './SocketContext.jsx';
 
-const ChannelInfo = ({ name, messageCount }) => {
+const ChannelInfo = () => {
+  const { name } = useSelector(selectCurrentChannelInfo);
+  const messages = useSelector(selectChannelMessages);
   const { t } = useTranslation();
   return (
-    <Card border="light" className="bg-light mb-2 p-0 shadow-sm small">
-      <Card.Body>
-        <Card.Title as="p" className="mb-0 font-weight-bold">{`# ${name}`}</Card.Title>
-        <Card.Text as="span" className="text-muted">
-          {
-          // @ts-ignore
-          t('messages.messageCount')(messageCount)
-          }
-        </Card.Text>
-      </Card.Body>
+    <Card border="light" className="bg-light mb-4 p-3 shadow-sm small">
+      <Card.Title as="p" className="mb-0">
+        <b>{`# ${name}`}</b>
+      </Card.Title>
+      <Card.Text as="span" className="text-muted">
+        {t('messages.messageCount')(messages.length)}
+      </Card.Text>
     </Card>
   );
 };
 
 const Message = ({ message, username }) => (
   <Toast
-    className={(username === message.username) ? 'bg-info' : 'bg-light'}
+    bg={(username === message.username) ? 'info' : 'light'}
+    className="mt-2"
   >
     <Toast.Header closeButton={false}>
       <strong className="me-auto">{message.username}</strong>
@@ -43,9 +41,11 @@ const Message = ({ message, username }) => (
   </Toast>
 );
 
-const NewMessage = ({ username, channelId }) => {
+const NewMessage = () => {
+  const { user } = useUserContext();
+  const channelId = useSelector(selectCurrentChannelId);
   const inputRef = useRef(null);
-  const { sendMessage } = useContext(SocketContext);
+  const { emitMessage, emitTypes } = useContext(SocketContext);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -63,15 +63,21 @@ const NewMessage = ({ username, channelId }) => {
             const newMessage = {
               body: values.message,
               channelId,
-              username,
+              username: user.username,
             };
-            await sendMessage(newMessage);
+            await emitMessage(emitTypes.newMessage, newMessage);
             resetForm();
           } catch (error) {
-            setErrors({
-              message: t('errors.sendError'),
-            });
-            console.log(error);
+            if (error.isTimeoutError || error.isSocketError) {
+              setErrors({
+                message: error.message,
+              });
+            } else {
+              setErrors({
+                message: t('errors.sendError'),
+              });
+            }
+            console.error(error);
           }
         }}
       >
@@ -90,13 +96,13 @@ const NewMessage = ({ username, channelId }) => {
                 disabled={isSubmitting}
                 innerRef={inputRef}
               />
-              <InputGroup.Append>
-                <Button
-                  type="submit"
-                  variant="group-vertical"
-                  disabled={isSubmitting || (values.message.length === 0)}
-                >
-                  {
+              <ErrorMessage name="message" component="div" className="invalid-feedback" />
+              <Button
+                type="submit"
+                variant="group-vertical"
+                disabled={isSubmitting || (values.message.length === 0)}
+              >
+                {
                   isSubmitting
                     ? (
                       <Spinner
@@ -108,10 +114,8 @@ const NewMessage = ({ username, channelId }) => {
                       />
                     )
                     : <Icon.ArrowRightSquare width="20" height="20" />
-                  }
-                </Button>
-              </InputGroup.Append>
-              <ErrorMessage name="message" component="div" className="invalid-feedback" />
+              }
+              </Button>
             </InputGroup>
           </Form>
         )}
@@ -121,9 +125,8 @@ const NewMessage = ({ username, channelId }) => {
 };
 
 const Messages = () => {
-  const channel = useSelector(selectCurrentChannelInfo);
-  const messages = useSelector(selectChannelMessages);
   const { user } = useUserContext();
+  const messages = useSelector(selectChannelMessages);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -133,7 +136,7 @@ const Messages = () => {
   return (
     <div className="col p-0 h-100">
       <div className="d-flex flex-column h-100">
-        <ChannelInfo name={channel.name} messageCount={messages.length} />
+        <ChannelInfo />
         {(messages.length === 0)
           ? null
           : (
@@ -151,7 +154,7 @@ const Messages = () => {
               <div ref={scrollRef} />
             </div>
           )}
-        <NewMessage username={user.username} channelId={channel.id} />
+        <NewMessage />
       </div>
     </div>
   );

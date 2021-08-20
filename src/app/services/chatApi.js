@@ -6,7 +6,6 @@ export const chatApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: rtkRoutes.baseUrl(),
   }),
-  entityTypes: ['Counter'],
   endpoints: (builder) => ({
     getChatData: builder.query({
       query(user) {

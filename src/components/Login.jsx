@@ -57,20 +57,20 @@ const Login = (props) => {
                           password: t('errors.generic'),
                         });
                       }
-                      console.log(error.response);
+                      console.error(error.response);
                     } else if (error.request) {
                       setErrors({
                         username: ' ',
                         password: t('errors.generic'),
                       });
-                      console.log(error.request);
+                      console.error(error.request);
                     } else {
                       setErrors({
                         username: ' ',
                         password: t('errors.generic'),
                       });
 
-                      console.log(error);
+                      console.error(error);
                     }
                   }
                 }}
@@ -88,6 +88,7 @@ const Login = (props) => {
                         id="username"
                         className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                       />
+                      <label className="form-label" htmlFor="username">{t('login.username')}</label>
                     </div>
                     <div className="form-floating mb-4 form-group">
                       <Field
@@ -99,6 +100,7 @@ const Login = (props) => {
                         id="password"
                         className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                       />
+                      <label className="form-label" htmlFor="password">{t('login.password')}</label>
                       <ErrorMessage name="password" component="div" className="invalid-feedback" />
                     </div>
                     <button type="submit" disabled={isSubmitting} className="w-100 mb-3 btn btn-outline-primary">{t('login.enter')}</button>

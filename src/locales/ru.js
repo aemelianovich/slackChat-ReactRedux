@@ -7,6 +7,30 @@ export default {
     channels: {
       title: 'Каналы',
       prefix: '#',
+      addChannel: {
+        title: 'Добавить канал',
+        closeBtn: 'Отменить',
+        submitBtn: 'Отправить',
+        requiredName: 'Обязательное поле',
+        uniqueName: 'Должно быть уникальным',
+        nameLength: 'От 3 до 20 символов',
+      },
+      removeChannel: {
+        dropDownTitle: 'Удалить',
+        title: 'Удалить канал',
+        closeBtn: 'Отменить',
+        submitBtn: 'Удалить',
+        question: 'Уверены?',
+      },
+      renameChannel: {
+        dropDownTitle: 'Переименовать',
+        title: 'Переименовать канал',
+        closeBtn: 'Отменить',
+        submitBtn: 'Отправить',
+        requiredName: 'Обязательное поле',
+        uniqueName: 'Должно быть уникальным',
+        nameLength: 'От 3 до 20 символов',
+      },
     },
     login: {
       enter: 'Войти',
@@ -70,6 +94,8 @@ export default {
       generic: 'Свяжитесь с администратором',
       existingUser: 'Такой пользователь уже существует',
       sendError: 'Ошибка при отправке сообщения. Попробуйте снова или свяжитесь с администратором.',
+      timeoutError: 'Сеть работает медленно, попробуйте позднее или свяжитесь с администратором. ',
+      socketError: 'Соединение не установлено, попробуйте позднее или свяжитесь с администратором. ',
     },
     noMatch: {
       title: '404 Error Code',

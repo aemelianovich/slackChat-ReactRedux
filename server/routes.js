@@ -71,7 +71,7 @@ export default (app, defaultState = {}) => {
         state.messages.push(messageWithId);
         acknowledge({ status: 'ok' });
         app.io.emit('newMessage', messageWithId);
-      }, 6000);
+      }, 4000);
     });
 
     socket.on('newChannel', (channel, acknowledge = _.noop) => {
@@ -81,9 +81,11 @@ export default (app, defaultState = {}) => {
         id: getNextId(),
       };
 
-      state.channels.push(channelWithId);
-      acknowledge({ status: 'ok', data: channelWithId });
-      app.io.emit('newChannel', channelWithId);
+      setTimeout(() => {
+        state.channels.push(channelWithId);
+        acknowledge({ status: 'ok', data: channelWithId });
+        app.io.emit('newChannel', channelWithId);
+      }, 4000);
     });
 
     socket.on('removeChannel', ({ id }, acknowledge = _.noop) => {
@@ -102,8 +104,10 @@ export default (app, defaultState = {}) => {
       if (!channel) return;
       channel.name = name;
 
-      acknowledge({ status: 'ok' });
-      app.io.emit('renameChannel', channel);
+      setTimeout(() => {
+        acknowledge({ status: 'ok' });
+        app.io.emit('renameChannel', channel);
+      }, 4000);
     });
   });
 

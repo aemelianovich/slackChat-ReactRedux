@@ -74,14 +74,14 @@ const SignUp = (props) => {
                           confirmpassword: t('errors.generic'),
                         });
                       }
-                      console.log(error.response);
+                      console.error(error.response);
                     } else if (error.request) {
                       setErrors({
                         username: ' ',
                         password: ' ',
                         confirmpassword: t('errors.generic'),
                       });
-                      console.log(error.request);
+                      console.error(error.request);
                     } else {
                       setErrors({
                         username: ' ',
@@ -89,7 +89,7 @@ const SignUp = (props) => {
                         confirmpassword: t('errors.generic'),
                       });
 
-                      console.log(error);
+                      console.error(error);
                     }
                   }
                 }}
@@ -108,6 +108,7 @@ const SignUp = (props) => {
                         id="username"
                         className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
                       />
+                      <label className="form-label" htmlFor="username">{t('signUp.username')}</label>
                       <ErrorMessage name="username" component="div" className="invalid-feedback" />
                     </div>
                     <div className="form-floating mb-3 form-group">
@@ -122,6 +123,7 @@ const SignUp = (props) => {
                         className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
                         aria-autocomplete="list"
                       />
+                      <label className="form-label" htmlFor="password">{t('signUp.password')}</label>
                       <ErrorMessage name="password" component="div" className="invalid-feedback" />
                     </div>
                     <div className="form-floating mb-4 form-group">
@@ -134,6 +136,7 @@ const SignUp = (props) => {
                         id="confirmpassword"
                         className={`form-control${errors.confirmpassword && touched.confirmpassword ? ' is-invalid' : ''}`}
                       />
+                      <label className="form-label" htmlFor="confirmpassword">{t('signUp.confirmPassword')}</label>
                       <ErrorMessage name="confirmpassword" component="div" className="invalid-feedback" />
                     </div>
                     <button type="submit" disabled={isSubmitting} className="w-100 btn btn-outline-primary">

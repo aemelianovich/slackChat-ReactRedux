@@ -17,11 +17,30 @@ export const channelsSlice = createSlice({
     setCurrentChannelId: (state, action) => {
       state.currentChannelId = action.payload.id;
     },
+    addChannel: (state, action) => {
+      state.channels.push(action.payload.newChannel);
+    },
+    renameChannel: (state, action) => {
+      const index = state.channels.findIndex((channel) => channel.id === action.payload.channel.id);
+      if (index) {
+        state.channels[index] = action.payload.channel;
+      }
+    },
+    removeChannel:
+    (state, action) => {
+      const newChannels = state.channels
+        .filter((channel) => channel.id !== action.payload.channelId);
+
+      state.channels = newChannels;
+      state.currentChannelId = state.channels[0].id;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { initChatData, setCurrentChannelId } = channelsSlice.actions;
+export const {
+  initChatData, setCurrentChannelId, addChannel, renameChannel, removeChannel,
+} = channelsSlice.actions;
 
 export const selectChannels = (state) => state.channelsInfo.channels;
 export const selectCurrentChannelId = (state) => state.channelsInfo.currentChannelId;
