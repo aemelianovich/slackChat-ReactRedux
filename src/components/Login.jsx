@@ -117,9 +117,9 @@ const Login = (props) => {
                 {' '}
                 <a
                   href="/signup"
-                  onClick={(e) => { e.preventDefault(); alert('CLICK ON LINK'); console.log('CLICK ON LINK')}}
+                  onClick={(e) => { e.preventDefault(); props.history.push('/signup'); }}
                 >
-                    {t('login.registration')}
+                  {t('login.registration')}
                 </a>
               </div>
             </div>
