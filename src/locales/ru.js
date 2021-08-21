@@ -52,6 +52,7 @@ export default {
     },
     messages: {
       newMessage: 'Введите сообщение...',
+      sendMessageBtn: 'Отправить',
       messageCount: (count) => {
         // eslint-disable-next-line functional/no-let
         let msg = null;

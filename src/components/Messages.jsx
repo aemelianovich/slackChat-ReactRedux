@@ -118,6 +118,7 @@ const NewMessage = () => {
                     )
                     : <Icon.ArrowRightSquare width="20" height="20" />
               }
+                <span className="visually-hidden">{t('messages.sendMessageBtn')}</span>
               </Button>
             </InputGroup>
           </Form>
