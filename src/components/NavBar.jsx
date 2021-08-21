@@ -20,7 +20,7 @@ const NavBar = (props) => {
         <a
           className="navbar-brand"
           href="/"
-          onClick={(e) => { e.preventDefault(); location = e.target.href; }}
+          onClick={(e) => { e.preventDefault(); console.log('CLICK ON HEXLET CHAT'); location = e.target.href; }}
         >
           {t('navBar.title')}
         </a>
