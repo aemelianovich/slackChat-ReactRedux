@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { rtkRoutes } from '../../routes.js';
+import routes from '../../routes.js';
 
 export const chatApi = createApi({
   reducerPath: 'chatApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: rtkRoutes.baseUrl(),
+    baseUrl: '',
   }),
   endpoints: (builder) => ({
     getChatData: builder.query({
@@ -13,7 +13,7 @@ export const chatApi = createApi({
         myHeaders.append('Authorization', `Bearer ${user.token}`);
 
         return {
-          url: rtkRoutes.chatDataPath(),
+          url: routes.chatDataPath(),
           method: 'GET',
           headers: myHeaders,
         };
