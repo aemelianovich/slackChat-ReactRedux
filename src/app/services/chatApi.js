@@ -4,7 +4,7 @@ import routes from '../../routes.js';
 export const chatApi = createApi({
   reducerPath: 'chatApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: '',
+    baseUrl: routes.host,
   }),
   endpoints: (builder) => ({
     getChatData: builder.query({
