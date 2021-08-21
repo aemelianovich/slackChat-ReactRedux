@@ -3,7 +3,6 @@
 import 'core-js/stable/index.js';
 import 'regenerator-runtime/runtime.js';
 import React from 'react';
-import io from 'socket.io-client';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
@@ -16,20 +15,15 @@ import { SocketContext } from './components/SocketContext.jsx';
 import { actions } from './app/slices/index';
 import TimeoutError from './errors/TimeoutError';
 import SocketConnectionError from './errors/SocketConnectionError';
-import routes from './routes';
 import resources from './locales';
 
-export default () => {
+export default (socket) => {
   // ////////////////// //
   // Init localization  //
   // ////////////////// //
   const rollbarConfig = {
     accessToken: '0ed50afbd64e4730b25360b9eedaf090',
-    environment: 'production',
-    server: {
-      root: routes.host,
-      branch: 'main',
-    },
+    environment: (process.env.NODE_ENV === 'production'),
   };
   // ////////////////// //
   // Init localization  //
@@ -45,8 +39,7 @@ export default () => {
   // ////////////////// //
   // Init socket        //
   // ////////////////// //
-  const socket = io(routes.host);
-  const socketTimeout = 500;
+  const socketTimeout = 3000;
 
   const emitTypes = {
     newMessage: 'newMessage',
