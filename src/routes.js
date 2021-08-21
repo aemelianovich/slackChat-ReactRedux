@@ -5,7 +5,6 @@ const prefix = 'api/v1';
 
 export default {
   host,
-  rtkBaseUrl: () => (host ? [host, prefix, 'data'].join('/') : ''),
   chatDataPath: () => [host, prefix, 'data'].join('/'),
   channelsPath: () => [host, prefix, 'channels'].join('/'),
   channelPath: (id) => [host, prefix, 'channels', id].join('/'),
