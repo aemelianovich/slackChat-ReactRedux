@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "Chat(Slack)",
-  "main": "src/init.jsx",
+  "main": "src/index.jsx",
   "type": "module",
   "engines": {
     "node": "14.x"
