@@ -5,6 +5,7 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
+import { useRollbar } from '@rollbar/react';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import routes from '../routes.js';
@@ -15,6 +16,7 @@ import SignUpImage from '../../assets/images/SignUpImage.jpg';
 const SignUp = (props) => {
   const { setUser } = useUserContext();
   const { t } = useTranslation();
+  const rollbar = useRollbar();
 
   const SignUpSchema = Yup.object().shape({
     username: Yup.string()
@@ -67,12 +69,14 @@ const SignUp = (props) => {
                           password: ' ',
                           confirmpassword: t('errors.existingUser'),
                         });
+                        rollbar.info('SignUp Existing User', error);
                       } else {
                         setErrors({
                           username: ' ',
                           password: ' ',
                           confirmpassword: t('errors.generic'),
                         });
+                        rollbar.error('SignUp Response', error);
                       }
                       console.error(error.response);
                     } else if (error.request) {
@@ -81,6 +85,7 @@ const SignUp = (props) => {
                         password: ' ',
                         confirmpassword: t('errors.generic'),
                       });
+                      rollbar.error('SignUp Request', error);
                       console.error(error.request);
                     } else {
                       setErrors({
@@ -88,7 +93,7 @@ const SignUp = (props) => {
                         password: ' ',
                         confirmpassword: t('errors.generic'),
                       });
-
+                      rollbar.error('SignUp', error);
                       console.error(error);
                     }
                   }

@@ -8,6 +8,7 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { useRollbar } from '@rollbar/react';
 import { selectCurrentChannelInfo, selectCurrentChannelId } from '../app/slices/channelsSlice';
 import { selectChannelMessages } from '../app/slices/messagesSlice';
 import { useUserContext } from './UserContext.jsx';
@@ -47,6 +48,7 @@ const NewMessage = () => {
   const inputRef = useRef(null);
   const { emitMessage, emitTypes } = useContext(SocketContext);
   const { t } = useTranslation();
+  const rollbar = useRollbar();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -77,6 +79,7 @@ const NewMessage = () => {
                 message: t('errors.sendError'),
               });
             }
+            rollbar.error('NewMessage', error);
             console.error(error);
           }
         }}

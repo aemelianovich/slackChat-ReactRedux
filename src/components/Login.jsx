@@ -5,6 +5,7 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
+import { useRollbar } from '@rollbar/react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from './UserContext.jsx';
 import routes from '../routes.js';
@@ -14,6 +15,7 @@ import LoginChatImage from '../../assets/images/loginChat.jpg';
 const Login = (props) => {
   const { setUser } = useUserContext();
   const { t } = useTranslation();
+  const rollbar = useRollbar();
 
   return (
     <div className="container-fluid h-100">
@@ -51,11 +53,13 @@ const Login = (props) => {
                           username: ' ',
                           password: t('errors.password'),
                         });
+                        rollbar.info('Login incorrect password', error);
                       } else {
                         setErrors({
                           username: ' ',
                           password: t('errors.generic'),
                         });
+                        rollbar.error('Login Response', error);
                       }
                       console.error(error.response);
                     } else if (error.request) {
@@ -69,7 +73,7 @@ const Login = (props) => {
                         username: ' ',
                         password: t('errors.generic'),
                       });
-
+                      rollbar.error('Login Request', error);
                       console.error(error);
                     }
                   }

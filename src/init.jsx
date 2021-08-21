@@ -3,10 +3,11 @@
 import 'core-js/stable/index.js';
 import 'regenerator-runtime/runtime.js';
 import React from 'react';
-import { Provider } from 'react-redux';
 import io from 'socket.io-client';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
+import { Provider } from 'react-redux';
 
 import '../assets/application.scss';
 import App from './components/App.jsx';
@@ -22,6 +23,17 @@ export default () => {
   // ////////////////// //
   // Init localization  //
   // ////////////////// //
+  const rollbarConfig = {
+    accessToken: '0ed50afbd64e4730b25360b9eedaf090',
+    environment: 'production',
+    server: {
+      root: routes.host,
+      branch: 'main',
+    },
+  };
+  // ////////////////// //
+  // Init localization  //
+  // ////////////////// //
   i18n
     .use(initReactI18next)
     .init({
@@ -34,7 +46,7 @@ export default () => {
   // Init socket        //
   // ////////////////// //
   const socket = io(routes.host);
-  const socketTimeout = 9000;
+  const socketTimeout = 500;
 
   const emitTypes = {
     newMessage: 'newMessage',
@@ -97,10 +109,14 @@ export default () => {
   // Init App           //
   // ////////////////// //
   return (
-    <SocketContext.Provider value={{ emitMessage, emitTypes }}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </SocketContext.Provider>
+    <RollbarProvider config={rollbarConfig}>
+      <ErrorBoundary>
+        <SocketContext.Provider value={{ emitMessage, emitTypes }}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </SocketContext.Provider>
+      </ErrorBoundary>
+    </RollbarProvider>
   );
 };

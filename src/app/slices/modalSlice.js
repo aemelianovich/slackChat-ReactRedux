@@ -21,7 +21,7 @@ export const modalSlice = createSlice({
       if (!(Object.values(modalTypes).includes(action.payload.type))) {
         throw new Error(`Unsupported modal type: ${action.payload.type}`);
       }
-
+      // throw new Error(`Unsupported modal type: ${action.payload.type}`);
       state.isOpened = true;
       state.type = action.payload.type;
       state.extra = action.payload.extra;

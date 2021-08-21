@@ -10,32 +10,16 @@ const getNextId = () => Number(_.uniqueId());
 const buildState = (defaultState) => {
   const generalChannelId = getNextId();
   const randomChannelId = getNextId();
-  const messageId1 = getNextId();
-  const messageId2 = getNextId();
+
   const state = {
     channels: [
       { id: generalChannelId, name: 'general', removable: false },
       { id: randomChannelId, name: 'random', removable: false },
     ],
-    messages: [
-      {
-        body: 'Welcome to our Chat.',
-        channelId: generalChannelId,
-        username: 'ghost',
-        id: messageId1,
-      },
-      {
-        body: 'Hi there.',
-        channelId: generalChannelId,
-        username: 'admin',
-        id: messageId2,
-      },
-    ],
+    messages: [],
     currentChannelId: generalChannelId,
     users: [
       { id: 1, username: 'admin', password: 'admin' },
-      { id: 2, username: 'test', password: 'test' },
-      { id: 3, username: 'ghost', password: 'ghost' },
     ],
   };
 
@@ -66,12 +50,9 @@ export default (app, defaultState = {}) => {
         ...message,
         id: getNextId(),
       };
-
-      setTimeout(() => {
-        state.messages.push(messageWithId);
-        acknowledge({ status: 'ok' });
-        app.io.emit('newMessage', messageWithId);
-      }, 4000);
+      state.messages.push(messageWithId);
+      acknowledge({ status: 'ok' });
+      app.io.emit('newMessage', messageWithId);
     });
 
     socket.on('newChannel', (channel, acknowledge = _.noop) => {
@@ -80,12 +61,9 @@ export default (app, defaultState = {}) => {
         removable: true,
         id: getNextId(),
       };
-
-      setTimeout(() => {
-        state.channels.push(channelWithId);
-        acknowledge({ status: 'ok', data: channelWithId });
-        app.io.emit('newChannel', channelWithId);
-      }, 4000);
+      state.channels.push(channelWithId);
+      acknowledge({ status: 'ok', data: channelWithId });
+      app.io.emit('newChannel', channelWithId);
     });
 
     socket.on('removeChannel', ({ id }, acknowledge = _.noop) => {
@@ -93,7 +71,6 @@ export default (app, defaultState = {}) => {
       state.channels = state.channels.filter((c) => c.id !== channelId);
       state.messages = state.messages.filter((m) => m.channelId !== channelId);
       const data = { id: channelId };
-
       acknowledge({ status: 'ok' });
       app.io.emit('removeChannel', data);
     });
@@ -103,11 +80,8 @@ export default (app, defaultState = {}) => {
       const channel = state.channels.find((c) => c.id === channelId);
       if (!channel) return;
       channel.name = name;
-
-      setTimeout(() => {
-        acknowledge({ status: 'ok' });
-        app.io.emit('renameChannel', channel);
-      }, 4000);
+      acknowledge({ status: 'ok' });
+      app.io.emit('renameChannel', channel);
     });
   });
 

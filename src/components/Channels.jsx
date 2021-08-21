@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Nav, Modal, Spinner, ButtonGroup, Dropdown,
 } from 'react-bootstrap';
+import { useRollbar } from '@rollbar/react';
 import * as Icon from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
@@ -32,6 +33,7 @@ const ChannelModalWindow = () => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const rollbar = useRollbar();
 
   const { isOpened, type, extra } = useSelector(selectModalState);
   const modalType = type || 'default';
@@ -140,6 +142,7 @@ const ChannelModalWindow = () => {
                 });
               }
               console.error(error);
+              rollbar.error('ChannelModalWindow', error);
             }
           }}
         >
@@ -151,22 +154,32 @@ const ChannelModalWindow = () => {
                 {
                   (modalType === removeChannelModalType)
                     ? (
-                      <p className="lead">{modalWindowTypes[modalType].modalQuestion}</p>
+                      <>
+                        <p
+                          className="lead"
+                          data-testid={modalWindowTypes[modalType].testId}
+                        >
+                          {modalWindowTypes[modalType].modalQuestion}
+                        </p>
+                        {errors.name && <div className="text-danger">{errors.name}</div>}
+                      </>
                     )
                     : (
-                      <Field
-                        name="name"
-                        autoComplete="name"
-                        id="name"
-                        className={`mb-2 form-control${errors.name && touched.name ? ' is-invalid' : ''}`}
-                        autoFocus
-                        disabled={isSubmitting}
-                        data-testid={modalWindowTypes[modalType].testId}
-                        innerRef={inputRef}
-                      />
+                      <>
+                        <Field
+                          name="name"
+                          autoComplete="name"
+                          id="name"
+                          className={`mb-2 form-control${errors.name && touched.name ? ' is-invalid' : ''}`}
+                          autoFocus
+                          disabled={isSubmitting}
+                          data-testid={modalWindowTypes[modalType].testId}
+                          innerRef={inputRef}
+                        />
+                        <ErrorMessage name="name" component="div" className="invalid-feedback" />
+                      </>
                     )
                 }
-                <ErrorMessage name="name" component="div" className="invalid-feedback" />
                 <div className="d-flex justify-content-end">
                   <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
                     {modalWindowTypes[modalType].closeBtnTitle}
