@@ -5,6 +5,7 @@ import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { useRollbar } from '@rollbar/react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from './UserContext.jsx';
@@ -115,12 +116,7 @@ const Login = (props) => {
               <div className="text-center">
                 <span>{t('login.noUsername')}</span>
                 {' '}
-                <a
-                  href="/signup"
-                  onClick={(e) => { e.preventDefault(); props.history.push('/signup'); }}
-                >
-                  {t('login.registration')}
-                </a>
+                <Link to="/signup">{t('login.registration')}</Link>
               </div>
             </div>
           </div>

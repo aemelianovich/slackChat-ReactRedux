@@ -2,10 +2,11 @@
 
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from './UserContext.jsx';
 
-const NavBar = (props) => {
+const NavBar = () => {
   const { user, setUser } = useUserContext();
   const { t } = useTranslation();
 
@@ -17,13 +18,7 @@ const NavBar = (props) => {
   return (
     <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
       <div className="container">
-        <a
-          className="navbar-brand"
-          href="/"
-          onClick={(e) => { e.preventDefault(); console.log('CLICK ON HEXLET CHAT'); location = e.target.href; }}
-        >
-          {t('navBar.title')}
-        </a>
+        <Link className="navbar-brand" to="/">{t('navBar.title')}</Link>
         { user ? (<Button variant="primary" onClick={handleClick}>{t('navBar.exit')}</Button>) : null}
       </div>
     </nav>
