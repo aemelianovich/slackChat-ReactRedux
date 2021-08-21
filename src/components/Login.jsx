@@ -43,9 +43,6 @@ const Login = (props) => {
                       data,
                     );
 
-                    // alert(JSON.stringify(response, null, 2));
-                    console.log(`Login Response. username = ${response.data.username}, token=${response.data.token}`);
-                    console.log(`Response: ${JSON.stringify(response)}`);
                     setUser({ username: response.data.username, token: response.data.token });
                     props.history.push('/');
                   } catch (error) {

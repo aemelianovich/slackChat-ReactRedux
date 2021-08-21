@@ -7,6 +7,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import { Provider } from 'react-redux';
+import axios from 'axios';
 
 import '../assets/application.scss';
 import App from './components/App.jsx';
@@ -16,8 +17,14 @@ import { actions } from './app/slices/index';
 import TimeoutError from './errors/TimeoutError';
 import SocketConnectionError from './errors/SocketConnectionError';
 import resources from './locales';
+import routes from './routes';
 
 export default (socket) => {
+  // ////////////////// //
+  // Init axios  //
+  // ////////////////// //
+  axios.defaults.baseURL = routes.host;
+
   // ////////////////// //
   // Init localization  //
   // ////////////////// //
