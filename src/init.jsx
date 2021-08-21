@@ -23,7 +23,7 @@ export default (socket) => {
   // ////////////////// //
   const rollbarConfig = {
     accessToken: '0ed50afbd64e4730b25360b9eedaf090',
-    environment: (process.env.NODE_ENV === 'production'),
+    environment: process.env.NODE_ENV || 'development',
   };
   // ////////////////// //
   // Init localization  //
