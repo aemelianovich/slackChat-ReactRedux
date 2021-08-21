@@ -115,7 +115,7 @@ const Login = (props) => {
               <div className="text-center">
                 <span>{t('login.noUsername')}</span>
                 {' '}
-                <a href="/signup">{t('login.registration')}</a>
+                <a href="/signup" role="link">{t('login.registration')}</a>
               </div>
             </div>
           </div>
