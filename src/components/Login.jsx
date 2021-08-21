@@ -64,7 +64,7 @@ const Login = (props) => {
                     } else if (error.request) {
                       setErrors({
                         username: ' ',
-                        password: t('errors.password'),
+                        password: t('errors.generic'),
                       });
                       console.error(error.request);
                     } else {
