@@ -57,7 +57,7 @@ const Login = (props) => {
                       } else {
                         setErrors({
                           username: ' ',
-                          password: t('errors.generic'),
+                          password: t('errors.password'),
                         });
                         rollbar.error('Login Response', error);
                       }
