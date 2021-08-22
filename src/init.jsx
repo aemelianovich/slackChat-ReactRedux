@@ -23,7 +23,7 @@ export default (socket) => {
   // ////////////////// //
   // Init axios  //
   // ////////////////// //
-  axios.defaults.baseURL = routes.host;
+  // axios.defaults.baseURL = routes.host;
 
   // ////////////////// //
   // Init localization  //
