@@ -9,6 +9,7 @@ import {
 } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useRollbar } from '@rollbar/react';
+import { Element, scroller } from 'react-scroll';
 import { selectCurrentChannelInfo, selectCurrentChannelId } from '../app/slices/channelsSlice';
 import { selectChannelMessages } from '../app/slices/messagesSlice';
 import { useUserContext } from './UserContext.jsx';
@@ -30,16 +31,18 @@ const ChannelInfo = () => {
   );
 };
 
-const Message = ({ message, username }) => (
-  <Toast
-    bg={(username === message.username) ? 'info' : 'light'}
-    className="mt-2"
-  >
-    <Toast.Header closeButton={false}>
-      <strong className="me-auto">{message.username}</strong>
-    </Toast.Header>
-    <Toast.Body>{message.body}</Toast.Body>
-  </Toast>
+const Message = ({ message, username, index }) => (
+  <Element name={`message-index-${index}`}>
+    <Toast
+      bg={(username === message.username) ? 'info' : 'light'}
+      className="mt-2"
+    >
+      <Toast.Header closeButton={false}>
+        <strong className="me-auto">{message.username}</strong>
+      </Toast.Header>
+      <Toast.Body>{message.body}</Toast.Body>
+    </Toast>
+  </Element>
 );
 
 const NewMessage = () => {
@@ -131,11 +134,16 @@ const NewMessage = () => {
 const Messages = () => {
   const { user } = useUserContext();
   const messages = useSelector(selectChannelMessages);
-  const scrollRef = useRef(null);
 
-  /*useEffect(() => {
-    scrollRef.current?.scrollIntoView();
-  }, [messages]);*/
+  useEffect(() => {
+    const index = messages.length - 1;
+    if (index > 0) {
+      scroller.scrollTo(`message-index-${index}`, {
+        smooth: false,
+        containerId: 'messages-box',
+      });
+    }
+  }, [messages]);
 
   return (
     <div className="col p-0 h-100">
@@ -148,14 +156,14 @@ const Messages = () => {
               id="messages-box"
               className="chat-messages overflow-auto px-5"
             >
-              {messages.map((message) => (
+              {messages.map((message, index) => (
                 <Message
                   message={message}
                   username={user.username}
+                  index={index}
                   key={message.id}
                 />
               ))}
-              <div ref={scrollRef} />
             </div>
           )}
         <NewMessage />
