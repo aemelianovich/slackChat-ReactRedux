@@ -36,7 +36,7 @@ const ChannelModalWindow = () => {
   const rollbar = useRollbar();
 
   const { isOpened, type, extra } = useSelector(selectModalState);
-  const modalType = type || 'default';
+  const modalType = type;
 
   const channels = useSelector(selectChannels);
   const channelNames = channels.map((channel) => channel.name);
@@ -88,14 +88,6 @@ const ChannelModalWindow = () => {
       closeBtnTitle: t(`channels.${removeChannelModalType}.closeBtn`),
       submitBtnTitle: t(`channels.${removeChannelModalType}.submitBtn`),
     },
-    default: {
-      validationSchema: null,
-      testId: '',
-      submitAction: null,
-      modalTitle: '',
-      closeBtnTitle: '',
-      submitBtnTitle: '',
-    },
   };
 
   const closeModal = () => {
@@ -109,6 +101,9 @@ const ChannelModalWindow = () => {
     });
   });
 
+  if (!modalType) {
+    return null;
+  }
   return (
     <Modal
       show={isOpened}
