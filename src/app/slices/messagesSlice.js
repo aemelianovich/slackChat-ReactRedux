@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
-import { initChatData, removeChannel } from './channelsSlice.js';
+import { fetchChatData, removeChannel } from './channelsSlice.js';
 
 const initialState = {
   messages: [],
@@ -16,7 +16,7 @@ export const messagesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initChatData, (state, action) => {
+      .addCase(fetchChatData.fulfilled, (state, action) => {
         state.messages = action.payload.messages;
       })
       .addCase(removeChannel,

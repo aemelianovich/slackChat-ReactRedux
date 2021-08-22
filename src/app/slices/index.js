@@ -1,12 +1,12 @@
 import channelsReducer,
 {
-  initChatData, addChannel, setCurrentChannelId, renameChannel, removeChannel,
+  fetchChatData, addChannel, setCurrentChannelId, renameChannel, removeChannel,
 } from './channelsSlice';
 import messagesReducer, { addMessage } from './messagesSlice';
 import modalReducer, { openModal, closeModal } from './modalSlice';
 
 const actions = {
-  initChatData,
+  fetchChatData,
   addChannel,
   renameChannel,
   removeChannel,

@@ -1,19 +1,24 @@
 /* eslint-disable no-param-reassign */
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import routes from '../../routes.js';
 
 const initialState = {
   channels: [],
   currentChannelId: null,
 };
 
+export const fetchChatData = createAsyncThunk('channelsInfo/fetchChatData', async (user) => {
+  const myHeaders = new Headers();
+  myHeaders.append('Authorization', `Bearer ${user.token}`);
+  const response = await axios.get(routes.chatDataPath(), { headers: { Authorization: `Bearer ${user.token}` } });
+  return response.data;
+});
+
 export const channelsSlice = createSlice({
   name: 'channelsInfo',
   initialState,
   reducers: {
-    initChatData: (state, action) => {
-      state.channels = action.payload.channels;
-      state.currentChannelId = action.payload.currentChannelId;
-    },
     setCurrentChannelId: (state, action) => {
       state.currentChannelId = action.payload.id;
     },
@@ -34,6 +39,12 @@ export const channelsSlice = createSlice({
       state.channels = newChannels;
       state.currentChannelId = state.channels[0].id;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchChatData.fulfilled, (state, action) => {
+      state.channels = action.payload.channels;
+      state.currentChannelId = action.payload.currentChannelId;
+    });
   },
 });
 
