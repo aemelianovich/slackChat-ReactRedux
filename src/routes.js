@@ -5,10 +5,10 @@ const prefix = 'api/v1';
 
 export default {
   host,
-  chatDataPath: () => [host, prefix, 'data'].join('/'),
-  channelsPath: () => [host, prefix, 'channels'].join('/'),
-  channelPath: (id) => [host, prefix, 'channels', id].join('/'),
-  channelMessagesPath: (id) => [host, prefix, 'channels', id, 'messages'].join('/'),
-  loginPath: () => [host, prefix, 'login'].join('/'),
-  signupPath: () => [host, prefix, 'signup'].join('/'),
+  chatDataPath: () => [prefix, 'data'].join('/'),
+  channelsPath: () => [prefix, 'channels'].join('/'),
+  channelPath: (id) => [prefix, 'channels', id].join('/'),
+  channelMessagesPath: (id) => [prefix, 'channels', id, 'messages'].join('/'),
+  loginPath: () => [prefix, 'login'].join('/'),
+  signupPath: () => [prefix, 'signup'].join('/'),
 };
