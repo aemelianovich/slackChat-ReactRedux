@@ -133,9 +133,9 @@ const Messages = () => {
   const messages = useSelector(selectChannelMessages);
   const scrollRef = useRef(null);
 
-  useEffect(() => {
+  /*useEffect(() => {
     scrollRef.current?.scrollIntoView();
-  }, [messages]);
+  }, [messages]);*/
 
   return (
     <div className="col p-0 h-100">
