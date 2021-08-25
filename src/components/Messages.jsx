@@ -9,7 +9,7 @@ import {
 } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useRollbar } from '@rollbar/react';
-import { Element, scroller } from 'react-scroll';
+import { animateScroll as scroll } from 'react-scroll';
 import { selectCurrentChannelInfo, selectCurrentChannelId } from '../app/slices/channelsSlice';
 import { selectChannelMessages } from '../app/slices/messagesSlice';
 import { useUserContext } from './UserContext.jsx';
@@ -31,18 +31,16 @@ const ChannelInfo = () => {
   );
 };
 
-const Message = ({ message, username, index }) => (
-  <Element name={`message-index-${index}`}>
-    <Toast
-      bg={(username === message.username) ? 'info' : 'light'}
-      className="mt-2"
-    >
-      <Toast.Header closeButton={false}>
-        <strong className="me-auto">{message.username}</strong>
-      </Toast.Header>
-      <Toast.Body>{message.body}</Toast.Body>
-    </Toast>
-  </Element>
+const Message = ({ message, username }) => (
+  <Toast
+    bg={(username === message.username) ? 'info' : 'light'}
+    className="mt-2"
+  >
+    <Toast.Header closeButton={false}>
+      <strong className="me-auto">{message.username}</strong>
+    </Toast.Header>
+    <Toast.Body>{message.body}</Toast.Body>
+  </Toast>
 );
 
 const NewMessage = () => {
@@ -136,13 +134,7 @@ const Messages = () => {
   const messages = useSelector(selectChannelMessages);
 
   useEffect(() => {
-    const index = messages.length - 1;
-    if (index > 0) {
-      scroller.scrollTo(`message-index-${index}`, {
-        smooth: false,
-        containerId: 'messages-box',
-      });
-    }
+    scroll.scrollToBottom({ containerId: 'messages-box', smooth: false });
   }, [messages]);
 
   return (
@@ -156,11 +148,10 @@ const Messages = () => {
               id="messages-box"
               className="chat-messages overflow-auto px-5"
             >
-              {messages.map((message, index) => (
+              {messages.map((message) => (
                 <Message
                   message={message}
                   username={user.username}
-                  index={index}
                   key={message.id}
                 />
               ))}

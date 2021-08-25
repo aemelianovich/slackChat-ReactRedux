@@ -11,6 +11,7 @@ import SignUp from './SignUp.jsx';
 import NoMatch from './NoMatch.jsx';
 import NavBar from './NavBar.jsx';
 import Chat from './Chat.jsx';
+import ChannelModal from './ChannelModal.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
 import UserContextProvider from './UserContext.jsx';
 
@@ -18,6 +19,7 @@ const App = () => (
   <BrowserRouter>
     <div className="d-flex flex-column h-100">
       <UserContextProvider>
+        <ChannelModal />
         <NavBar />
         <Switch>
           <Route path="/login" component={Login} />
