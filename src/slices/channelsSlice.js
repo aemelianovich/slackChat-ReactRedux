@@ -12,8 +12,6 @@ const initialState = {
 };
 
 const fetchInitData = createAsyncThunk('channelsInfo/fetchInitData', async (user) => {
-  const myHeaders = new Headers();
-  myHeaders.append('Authorization', `Bearer ${user.token}`);
   const response = await axios.get(routes.chatDataPath(), { headers: { Authorization: `Bearer ${user.token}` } });
   return response.data;
 });
