@@ -7,27 +7,22 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 
 import '../assets/application.scss';
 import App from './components/App.jsx';
-import store from './app/store';
 import { SocketContext } from './components/SocketContext.jsx';
-import { actions } from './app/slices/index';
+import { reducer, actions } from './slices/index';
 import TimeoutError from './errors/TimeoutError';
 import SocketConnectionError from './errors/SocketConnectionError';
 import resources from './locales';
 
 export default (socket) => {
-  // ////////////////// //
-  // Init localization  //
-  // ////////////////// //
   const rollbarConfig = {
     accessToken: '0ed50afbd64e4730b25360b9eedaf090',
     environment: process.env.NODE_ENV || 'development',
   };
-  // ////////////////// //
-  // Init localization  //
-  // ////////////////// //
+
   i18n
     .use(initReactI18next)
     .init({
@@ -36,9 +31,10 @@ export default (socket) => {
       resources,
     });
 
-  // ////////////////// //
-  // Init socket        //
-  // ////////////////// //
+  const store = configureStore({
+    reducer,
+  });
+
   const socketTimeout = 3000;
 
   const emitTypes = {
@@ -83,24 +79,17 @@ export default (socket) => {
   });
 
   socket.on(emitTypes.newChannel, (newChannel) => {
-    store.dispatch(actions.closeModal());
     store.dispatch(actions.addChannel({ newChannel }));
-    store.dispatch(actions.setCurrentChannelId({ id: newChannel.id }));
   });
 
   socket.on(emitTypes.renameChannel, (channel) => {
-    store.dispatch(actions.closeModal());
     store.dispatch(actions.renameChannel({ channel }));
   });
 
   socket.on(emitTypes.removeChannel, (data) => {
-    store.dispatch(actions.closeModal());
     store.dispatch(actions.removeChannel({ channelId: data.id }));
   });
 
-  // ////////////////// //
-  // Init App           //
-  // ////////////////// //
   return (
     <RollbarProvider config={rollbarConfig}>
       <ErrorBoundary>

@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useUserContext } from './UserContext.jsx';
-import { actions } from '../app/slices';
+import { actions } from '../slices';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
 
@@ -12,7 +12,7 @@ const Chat = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(actions.fetchChatData(user));
+    dispatch(actions.fetchInitData(user));
   }, [user]);
 
   return (

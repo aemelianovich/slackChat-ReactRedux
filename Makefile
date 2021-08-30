@@ -18,9 +18,6 @@ build:
 lint:
 	npx eslint . --ext js,jsx
 
-publish:
-	npm publish --dry-run
-
 deploy:
 	git push heroku
 

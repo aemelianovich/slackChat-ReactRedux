@@ -53,42 +53,9 @@ export default {
     messages: {
       newMessage: 'Введите сообщение...',
       sendMessageBtn: 'Отправить',
-      messageCount: (count) => {
-        // eslint-disable-next-line functional/no-let
-        let msg = null;
-
-        const lastDigit = (cnt) => {
-          const lastTwo = cnt % 100;
-          if (lastTwo >= 11 && lastTwo <= 14) {
-            return 0;
-          }
-
-          return (cnt % 10);
-        };
-
-        switch (lastDigit(count)) {
-          case 0:
-          case 5:
-          case 6:
-          case 7:
-          case 8:
-          case 9:
-            msg = 'сообщений';
-            break;
-          case 1:
-            msg = 'сообщение';
-            break;
-          case 2:
-          case 3:
-          case 4:
-            msg = 'сообщения';
-            break;
-          default:
-            throw new Error(`Can't define message for the ${lastDigit}`);
-        }
-
-        return `${count} ${msg}`;
-      },
+      messageCount_0: '{{count}} сообщение',
+      messageCount_1: '{{count}} сообщения',
+      messageCount_2: '{{count}} сообщений',
     },
     errors: {
       password: 'Неверные имя пользователя или пароль',

@@ -1,14 +1,17 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import routes from '../../routes.js';
+import _ from 'lodash';
+import routes from '../routes.js';
+
+const generalChannelIndex = 0;
 
 const initialState = {
   channels: [],
   currentChannelId: null,
 };
 
-export const fetchChatData = createAsyncThunk('channelsInfo/fetchChatData', async (user) => {
+const fetchInitData = createAsyncThunk('channelsInfo/fetchInitData', async (user) => {
   const myHeaders = new Headers();
   myHeaders.append('Authorization', `Bearer ${user.token}`);
   const response = await axios.get(routes.chatDataPath(), { headers: { Authorization: `Bearer ${user.token}` } });
@@ -24,6 +27,7 @@ export const channelsSlice = createSlice({
     },
     addChannel: (state, action) => {
       state.channels.push(action.payload.newChannel);
+      state.currentChannelId = action.payload.newChannel.id;
     },
     renameChannel: (state, action) => {
       const index = state.channels.findIndex((channel) => channel.id === action.payload.channel.id);
@@ -33,15 +37,14 @@ export const channelsSlice = createSlice({
     },
     removeChannel:
     (state, action) => {
-      const newChannels = state.channels
-        .filter((channel) => channel.id !== action.payload.channelId);
-
-      state.channels = newChannels;
-      state.currentChannelId = state.channels[0].id;
+      _.remove(state.channels, (channel) => channel.id === action.payload.channelId);
+      if (state.currentChannelId === action.payload.channelId) {
+        state.currentChannelId = state.channels[generalChannelIndex].id;
+      }
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchChatData.fulfilled, (state, action) => {
+    builder.addCase(fetchInitData.fulfilled, (state, action) => {
       state.channels = action.payload.channels;
       state.currentChannelId = action.payload.currentChannelId;
     });
@@ -49,22 +52,6 @@ export const channelsSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {
-  initChatData, setCurrentChannelId, addChannel, renameChannel, removeChannel,
-} = channelsSlice.actions;
-
-export const selectChannels = (state) => state.channelsInfo.channels;
-export const selectCurrentChannelId = (state) => state.channelsInfo.currentChannelId;
-export const selectCurrentChannelInfo = (state) => {
-  if (state.channelsInfo.channels.length === 0) {
-    return {};
-  }
-
-  const [currentChannel] = state.channelsInfo.channels.filter(
-    (channel) => (channel.id === state.channelsInfo.currentChannelId),
-  );
-
-  return currentChannel;
-};
+export const channelActions = { fetchInitData, ...channelsSlice.actions };
 
 export default channelsSlice.reducer;

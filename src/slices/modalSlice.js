@@ -8,9 +8,9 @@ const initialState = {
 };
 
 export const modalTypes = {
-  addChannelModalType: 'addChannel',
-  removeChannelModalType: 'removeChannel',
-  renameChannelModalType: 'renameChannel',
+  addChannel: 'addChannel',
+  removeChannel: 'removeChannel',
+  renameChannel: 'renameChannel',
 };
 
 export const modalSlice = createSlice({
@@ -18,7 +18,7 @@ export const modalSlice = createSlice({
   initialState,
   reducers: {
     openModal: (state, action) => {
-      if (!(Object.values(modalTypes).includes(action.payload.type))) {
+      if (!modalTypes[action.payload.type]) {
         throw new Error(`Unsupported modal type: ${action.payload.type}`);
       }
       // throw new Error(`Unsupported modal type: ${action.payload.type}`);
@@ -35,8 +35,6 @@ export const modalSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { openModal, closeModal } = modalSlice.actions;
-
-export const selectModalState = (state) => state.modal;
+export const modalActions = modalSlice.actions;
 
 export default modalSlice.reducer;

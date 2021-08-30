@@ -10,14 +10,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRollbar } from '@rollbar/react';
 import { animateScroll as scroll } from 'react-scroll';
-import { selectCurrentChannelInfo, selectCurrentChannelId } from '../app/slices/channelsSlice';
-import { selectChannelMessages } from '../app/slices/messagesSlice';
+import { selectors } from '../slices';
 import { useUserContext } from './UserContext.jsx';
 import { SocketContext } from './SocketContext.jsx';
 
 const ChannelInfo = () => {
-  const { name } = useSelector(selectCurrentChannelInfo);
-  const messages = useSelector(selectChannelMessages);
+  const { name } = useSelector(selectors.selectCurrentChannelInfo);
+  const messages = useSelector(selectors.selectChannelMessages);
   const { t } = useTranslation();
   return (
     <Card border="light" className="bg-light mb-4 p-3 shadow-sm small">
@@ -25,7 +24,7 @@ const ChannelInfo = () => {
         <b>{`# ${name}`}</b>
       </Card.Title>
       <Card.Text as="span" className="text-muted">
-        {t('messages.messageCount')(messages.length)}
+        {t('messages.messageCount', { count: messages.length })}
       </Card.Text>
     </Card>
   );
@@ -45,7 +44,7 @@ const Message = ({ message, username }) => (
 
 const NewMessage = () => {
   const { user } = useUserContext();
-  const channelId = useSelector(selectCurrentChannelId);
+  const channelId = useSelector(selectors.selectCurrentChannelId);
   const inputRef = useRef(null);
   const { emitMessage, emitTypes } = useContext(SocketContext);
   const { t } = useTranslation();
@@ -131,7 +130,7 @@ const NewMessage = () => {
 
 const Messages = () => {
   const { user } = useUserContext();
-  const messages = useSelector(selectChannelMessages);
+  const messages = useSelector(selectors.selectChannelMessages);
 
   useEffect(() => {
     scroll.scrollToBottom({ containerId: 'messages-box', smooth: false });

@@ -11,14 +11,11 @@ import * as Yup from 'yup';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
-import {
-  selectChannels,
-} from '../app/slices/channelsSlice.js';
-import { actions } from '../app/slices';
-import { selectModalState, modalTypes } from '../app/slices/modalSlice.js';
+import { actions, selectors } from '../slices';
+import { modalTypes } from '../slices/modalSlice.js';
 import { SocketContext } from './SocketContext.jsx';
 
-const { addChannelModalType, removeChannelModalType, renameChannelModalType } = modalTypes;
+const { addChannel, removeChannel, renameChannel } = modalTypes;
 
 export const openModal = (type, channelId, dispatch) => () => {
   const extra = channelId ? { channelId } : null;
@@ -34,9 +31,9 @@ const AddChannelModal = () => {
   const { t } = useTranslation();
   const rollbar = useRollbar();
 
-  const { isOpened, type } = useSelector(selectModalState);
+  const { isOpened, type } = useSelector(selectors.selectModalState);
 
-  const channels = useSelector(selectChannels);
+  const channels = useSelector(selectors.selectChannels);
   const channelNames = channels.map((channel) => channel.name);
 
   const { emitMessage, emitTypes } = useContext(SocketContext);
@@ -82,6 +79,7 @@ const AddChannelModal = () => {
           onSubmit={async (values, { setErrors }) => {
             try {
               await emitMessage(emitTypes.newChannel, { name: values.name });
+              closeModal();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -154,9 +152,9 @@ const RenameChannelModal = () => {
   const { t } = useTranslation();
   const rollbar = useRollbar();
 
-  const { isOpened, type, extra } = useSelector(selectModalState);
+  const { isOpened, type, extra } = useSelector(selectors.selectModalState);
 
-  const channels = useSelector(selectChannels);
+  const channels = useSelector(selectors.selectChannels);
   const channelNames = channels.map((channel) => channel.name);
   const [currentChannel] = channels
     .filter((channel) => channel.id === extra.channelId);
@@ -207,6 +205,7 @@ const RenameChannelModal = () => {
                 emitTypes.renameChannel,
                 { id: currentChannel.id, name: values.name },
               );
+              closeModal();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -278,9 +277,9 @@ const RemoveChannelModal = () => {
   const { t } = useTranslation();
   const rollbar = useRollbar();
 
-  const { isOpened, type, extra } = useSelector(selectModalState);
+  const { isOpened, type, extra } = useSelector(selectors.selectModalState);
 
-  const channels = useSelector(selectChannels);
+  const channels = useSelector(selectors.selectChannels);
   const [currentChannel] = channels
     .filter((channel) => channel.id === extra.channelId);
 
@@ -312,6 +311,7 @@ const RemoveChannelModal = () => {
           onSubmit={async ({ setErrors }) => {
             try {
               await emitMessage(emitTypes.removeChannel, { id: currentChannel.id });
+              closeModal();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -375,7 +375,7 @@ const RemoveChannelModal = () => {
 };
 
 const ChannelModal = () => {
-  const { type } = useSelector(selectModalState);
+  const { type } = useSelector(selectors.selectModalState);
   const rollbar = useRollbar();
 
   if (!type) {
@@ -383,11 +383,11 @@ const ChannelModal = () => {
   }
 
   switch (type) {
-    case addChannelModalType:
+    case addChannel:
       return <AddChannelModal />;
-    case removeChannelModalType:
+    case removeChannel:
       return <RemoveChannelModal />;
-    case renameChannelModalType:
+    case renameChannel:
       return <RenameChannelModal />;
     default:
       // eslint-disable-next-line no-case-declarations
