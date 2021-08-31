@@ -64,7 +64,7 @@ export default (socket) => {
           called = true;
           clearTimeout(timer);
           if (response.status === 'ok') {
-            resolve();
+            resolve(response);
           } else {
             console.error(response);
             reject(response);

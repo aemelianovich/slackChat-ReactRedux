@@ -18,15 +18,16 @@ const selectors = {
   selectChannels: (state) => state.channelsInfo.channels,
   selectCurrentChannelId: (state) => state.channelsInfo.currentChannelId,
   selectCurrentChannelInfo: (state) => {
+    const dummyChannel = { name: null, id: null, removable: null };
     if (state.channelsInfo.channels.length === 0) {
-      return {};
+      return dummyChannel;
     }
 
     const [currentChannel] = state.channelsInfo.channels.filter(
       (channel) => (channel.id === state.channelsInfo.currentChannelId),
     );
 
-    return currentChannel;
+    return currentChannel || dummyChannel;
   },
 };
 

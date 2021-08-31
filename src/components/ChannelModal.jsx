@@ -78,7 +78,8 @@ const AddChannelModal = () => {
           validateOnBlur={false}
           onSubmit={async (values, { setErrors }) => {
             try {
-              await emitMessage(emitTypes.newChannel, { name: values.name });
+              const response = await emitMessage(emitTypes.newChannel, { name: values.name });
+              dispatch(actions.setCurrentChannelId({ id: response.data.id }));
               closeModal();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
