@@ -13,21 +13,16 @@ const selectors = {
       (message) => (message.channelId === state.channelsInfo.currentChannelId),
     );
 
-    return messages;
+    return messages || [];
   },
   selectChannels: (state) => state.channelsInfo.channels,
-  selectCurrentChannelId: (state) => state.channelsInfo.currentChannelId,
-  selectCurrentChannelInfo: (state) => {
-    const dummyChannel = { name: null, id: null, removable: null };
-    if (state.channelsInfo.channels.length === 0) {
-      return dummyChannel;
-    }
-
-    const [currentChannel] = state.channelsInfo.channels.filter(
+  selectChannelNames: (state) => state.channelsInfo.channels.map((channel) => channel.name),
+  selectCurrentChannel: (state) => {
+    const currentChannel = state.channelsInfo.channels.find(
       (channel) => (channel.id === state.channelsInfo.currentChannelId),
     );
 
-    return currentChannel || dummyChannel;
+    return currentChannel;
   },
 };
 

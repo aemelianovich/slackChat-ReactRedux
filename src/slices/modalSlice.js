@@ -17,14 +17,10 @@ export const modalSlice = createSlice({
   name: 'modal',
   initialState,
   reducers: {
-    openModal: (state, action) => {
-      if (!modalTypes[action.payload.type]) {
-        throw new Error(`Unsupported modal type: ${action.payload.type}`);
-      }
-      // throw new Error(`Unsupported modal type: ${action.payload.type}`);
+    openModal: (state, { payload }) => {
       state.isOpened = true;
-      state.type = action.payload.type;
-      state.extra = action.payload.extra;
+      state.type = payload.type;
+      state.extra = payload.extra;
     },
     closeModal: (state) => {
       state.isOpened = false;
@@ -35,6 +31,6 @@ export const modalSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const modalActions = modalSlice.actions;
+export const { actions } = modalSlice;
 
 export default modalSlice.reducer;

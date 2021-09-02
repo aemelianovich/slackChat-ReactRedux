@@ -1,27 +1,26 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Card, Toast, Button, InputGroup, Spinner,
+  Card, Button, InputGroup, Spinner,
 } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useRollbar } from '@rollbar/react';
 import { animateScroll as scroll } from 'react-scroll';
 import { selectors } from '../slices';
 import { useUserContext } from './UserContext.jsx';
 import { SocketContext } from './SocketContext.jsx';
 
 const ChannelInfo = () => {
-  const { name } = useSelector(selectors.selectCurrentChannelInfo);
+  const channel = useSelector(selectors.selectCurrentChannel);
   const messages = useSelector(selectors.selectChannelMessages);
   const { t } = useTranslation();
   return (
     <Card border="light" className="bg-light mb-4 p-3 shadow-sm small">
       <Card.Title as="p" className="mb-0">
-        <b>{`# ${name}`}</b>
+        <b>{`# ${channel?.name}`}</b>
       </Card.Title>
       <Card.Text as="span" className="text-muted">
         {t('messages.messageCount', { count: messages.length })}
@@ -30,25 +29,19 @@ const ChannelInfo = () => {
   );
 };
 
-const Message = ({ message, username }) => (
-  <Toast
-    bg={(username === message.username) ? 'info' : 'light'}
-    className="mt-2"
-  >
-    <Toast.Header closeButton={false}>
-      <strong className="me-auto">{message.username}</strong>
-    </Toast.Header>
-    <Toast.Body>{message.body}</Toast.Body>
-  </Toast>
+const Message = ({ message }) => (
+  <div className="text-break mb-2">
+    <b>{message.username}</b>
+    {`: ${message.body}`}
+  </div>
 );
 
 const NewMessage = () => {
   const { user } = useUserContext();
-  const channelId = useSelector(selectors.selectCurrentChannelId);
+  const channel = useSelector(selectors.selectCurrentChannel);
   const inputRef = useRef(null);
   const { emitMessage, emitTypes } = useContext(SocketContext);
   const { t } = useTranslation();
-  const rollbar = useRollbar();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -64,7 +57,7 @@ const NewMessage = () => {
           try {
             const newMessage = {
               body: values.message,
-              channelId,
+              channelId: channel?.id,
               username: user.username,
             };
             await emitMessage(emitTypes.newMessage, newMessage);
@@ -79,8 +72,8 @@ const NewMessage = () => {
                 message: t('errors.sendError'),
               });
             }
-            rollbar.error('NewMessage', error);
             console.error(error);
+            throw error;
           }
         }}
       >
@@ -129,7 +122,6 @@ const NewMessage = () => {
 };
 
 const Messages = () => {
-  const { user } = useUserContext();
   const messages = useSelector(selectors.selectChannelMessages);
 
   useEffect(() => {
@@ -140,22 +132,17 @@ const Messages = () => {
     <div className="col p-0 h-100">
       <div className="d-flex flex-column h-100">
         <ChannelInfo />
-        {(messages.length === 0)
-          ? null
-          : (
-            <div
-              id="messages-box"
-              className="chat-messages overflow-auto px-5"
-            >
-              {messages.map((message) => (
-                <Message
-                  message={message}
-                  username={user.username}
-                  key={message.id}
-                />
-              ))}
-            </div>
-          )}
+        <div
+          id="messages-box"
+          className="chat-messages overflow-auto px-5"
+        >
+          {messages.map((message) => (
+            <Message
+              message={message}
+              key={message.id}
+            />
+          ))}
+        </div>
         <NewMessage />
       </div>
     </div>

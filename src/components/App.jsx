@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
-import NoMatch from './NoMatch.jsx';
+import Page404 from './404.jsx';
 import NavBar from './NavBar.jsx';
 import Chat from './Chat.jsx';
 import ChannelModal from './ChannelModal.jsx';
@@ -25,7 +25,7 @@ const App = () => (
           <Route path="/login" component={Login} />
           <Route path="/signup" component={SignUp} />
           <PrivateRoute exact path="/" component={Chat} />
-          <Route path="*" component={NoMatch} />
+          <Route path="*" component={Page404} />
         </Switch>
       </UserContextProvider>
     </div>

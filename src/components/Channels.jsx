@@ -14,7 +14,7 @@ import { openModal } from './ChannelModal.jsx';
 const { addChannel, removeChannel, renameChannel } = modalTypes;
 
 const Channel = ({ channel }) => {
-  const currentChannelId = useSelector(selectors.selectCurrentChannelId);
+  const currentChannel = useSelector(selectors.selectCurrentChannel);
   const { t } = useTranslation();
   const dispatch = useDispatch();
   return (
@@ -26,7 +26,7 @@ const Channel = ({ channel }) => {
             className="d-flex"
           >
             <Button
-              variant={(channel.id === currentChannelId) ? 'secondary' : ''}
+              variant={(channel.id === currentChannel?.id) ? 'secondary' : ''}
               className="w-100 rounded-0 text-start text-truncate"
               onClick={() => dispatch(actions.setCurrentChannelId({ id: channel.id }))}
             >
@@ -38,7 +38,7 @@ const Channel = ({ channel }) => {
 
             <Dropdown.Toggle
               split
-              variant={(channel.id === currentChannelId) ? 'secondary' : ''}
+              variant={(channel.id === currentChannel?.id) ? 'secondary' : ''}
               aria-haspopup
               className="flex-grow-0"
               id={`${channel.name}-dropdown-toggle`}
@@ -62,7 +62,7 @@ const Channel = ({ channel }) => {
         )
         : (
           <Button
-            variant={(channel.id === currentChannelId) ? 'secondary' : ''}
+            variant={(channel.id === currentChannel?.id) ? 'secondary' : ''}
             className="w-100 rounded-0 text-start"
             onClick={() => dispatch(actions.setCurrentChannelId({ id: channel.id }))}
           >

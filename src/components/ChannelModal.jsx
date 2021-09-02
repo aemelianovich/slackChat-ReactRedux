@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Modal, Spinner,
 } from 'react-bootstrap';
-import { useRollbar } from '@rollbar/react';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import {
@@ -17,6 +16,14 @@ import { SocketContext } from './SocketContext.jsx';
 
 const { addChannel, removeChannel, renameChannel } = modalTypes;
 
+const getValidationSchema = (type, channelNames, t) => Yup.object().shape({
+  name: Yup.string()
+    .required(t(`channels.${type}.requiredName`))
+    .min(3, t(`channels.${type}.nameLength`))
+    .max(20, t(`channels.${type}.nameLength`))
+    .notOneOf(channelNames, t(`channels.${type}.uniqueName`)),
+});
+
 export const openModal = (type, channelId, dispatch) => () => {
   const extra = channelId ? { channelId } : null;
   dispatch(actions.openModal({
@@ -25,44 +32,28 @@ export const openModal = (type, channelId, dispatch) => () => {
   }));
 };
 
+const closeModal = (dispatch) => () => {
+  dispatch(actions.closeModal());
+};
+
 const AddChannelModal = () => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const rollbar = useRollbar();
 
-  const { isOpened, type } = useSelector(selectors.selectModalState);
-
-  const channels = useSelector(selectors.selectChannels);
-  const channelNames = channels.map((channel) => channel.name);
+  const { type } = useSelector(selectors.selectModalState);
+  const channelNames = useSelector(selectors.selectChannelNames);
 
   const { emitMessage, emitTypes } = useContext(SocketContext);
-
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required(t(`channels.${type}.requiredName`))
-      .min(3, t(`channels.${type}.nameLength`))
-      .max(20, t(`channels.${type}.nameLength`))
-      .notOneOf(channelNames, t(`channels.${type}.uniqueName`)),
-  });
-
-  const closeModal = () => {
-    dispatch(actions.closeModal());
-  };
 
   useEffect(() => {
     setTimeout(() => {
       inputRef.current?.focus();
-      inputRef.current?.select();
     });
   });
 
   return (
-    <Modal
-      show={isOpened}
-      onHide={closeModal}
-      centered
-    >
+    <>
       <Modal.Header closeButton>
         <Modal.Title>
           <h4>{t(`channels.${type}.title`)}</h4>
@@ -73,14 +64,14 @@ const AddChannelModal = () => {
           initialValues={{
             name: '',
           }}
-          validationSchema={validationSchema}
+          validationSchema={getValidationSchema(type, channelNames, t)}
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={async (values, { setErrors }) => {
             try {
               const response = await emitMessage(emitTypes.newChannel, { name: values.name });
               dispatch(actions.setCurrentChannelId({ id: response.data.id }));
-              closeModal();
+              closeModal(dispatch)();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -92,7 +83,7 @@ const AddChannelModal = () => {
                 });
               }
               console.error(error);
-              rollbar.error('ChannelModalWindow', error);
+              throw error;
             }
           }}
         >
@@ -113,7 +104,7 @@ const AddChannelModal = () => {
                 />
                 <ErrorMessage name="name" component="div" className="invalid-feedback" />
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -143,7 +134,7 @@ const AddChannelModal = () => {
           )}
         </Formik>
       </Modal.Body>
-    </Modal>
+    </>
   );
 };
 
@@ -151,28 +142,14 @@ const RenameChannelModal = () => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const rollbar = useRollbar();
 
-  const { isOpened, type, extra } = useSelector(selectors.selectModalState);
+  const { type, extra } = useSelector(selectors.selectModalState);
 
   const channels = useSelector(selectors.selectChannels);
-  const channelNames = channels.map((channel) => channel.name);
-  const [currentChannel] = channels
-    .filter((channel) => channel.id === extra.channelId);
+  const channelNames = useSelector(selectors.selectChannelNames);
+  const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
   const { emitMessage, emitTypes } = useContext(SocketContext);
-
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required(t(`channels.${type}.requiredName`))
-      .min(3, t(`channels.${type}.nameLength`))
-      .max(20, t(`channels.${type}.nameLength`))
-      .notOneOf(channelNames, t(`channels.${type}.uniqueName`)),
-  });
-
-  const closeModal = () => {
-    dispatch(actions.closeModal());
-  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -182,11 +159,7 @@ const RenameChannelModal = () => {
   });
 
   return (
-    <Modal
-      show={isOpened}
-      onHide={closeModal}
-      centered
-    >
+    <>
       <Modal.Header closeButton>
         <Modal.Title>
           <h4>{t(`channels.${type}.title`)}</h4>
@@ -197,7 +170,7 @@ const RenameChannelModal = () => {
           initialValues={{
             name: currentChannel.name,
           }}
-          validationSchema={validationSchema}
+          validationSchema={getValidationSchema(type, channelNames, t)}
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={async (values, { setErrors }) => {
@@ -206,7 +179,7 @@ const RenameChannelModal = () => {
                 emitTypes.renameChannel,
                 { id: currentChannel.id, name: values.name },
               );
-              closeModal();
+              closeModal(dispatch)();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -218,7 +191,7 @@ const RenameChannelModal = () => {
                 });
               }
               console.error(error);
-              rollbar.error('ChannelModalWindow', error);
+              throw error;
             }
           }}
         >
@@ -239,7 +212,7 @@ const RenameChannelModal = () => {
                 />
                 <ErrorMessage name="name" component="div" className="invalid-feedback" />
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -269,33 +242,23 @@ const RenameChannelModal = () => {
           )}
         </Formik>
       </Modal.Body>
-    </Modal>
+    </>
   );
 };
 
 const RemoveChannelModal = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const rollbar = useRollbar();
 
-  const { isOpened, type, extra } = useSelector(selectors.selectModalState);
+  const { type, extra } = useSelector(selectors.selectModalState);
 
   const channels = useSelector(selectors.selectChannels);
-  const [currentChannel] = channels
-    .filter((channel) => channel.id === extra.channelId);
+  const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
   const { emitMessage, emitTypes } = useContext(SocketContext);
 
-  const closeModal = () => {
-    dispatch(actions.closeModal());
-  };
-
   return (
-    <Modal
-      show={isOpened}
-      onHide={closeModal}
-      centered
-    >
+    <>
       <Modal.Header closeButton>
         <Modal.Title>
           <h4>{t(`channels.${type}.title`)}</h4>
@@ -312,7 +275,7 @@ const RemoveChannelModal = () => {
           onSubmit={async ({ setErrors }) => {
             try {
               await emitMessage(emitTypes.removeChannel, { id: currentChannel.id });
-              closeModal();
+              closeModal(dispatch)();
             } catch (error) {
               if (error.isTimeoutError || error.isSocketError) {
                 setErrors({
@@ -324,7 +287,7 @@ const RemoveChannelModal = () => {
                 });
               }
               console.error(error);
-              rollbar.error('ChannelModalWindow', error);
+              throw error;
             }
           }}
         >
@@ -341,7 +304,7 @@ const RemoveChannelModal = () => {
                 </p>
                 {errors.name && <div className="text-danger">{errors.name}</div>}
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -371,31 +334,43 @@ const RemoveChannelModal = () => {
           )}
         </Formik>
       </Modal.Body>
-    </Modal>
+    </>
   );
 };
 
 const ChannelModal = () => {
-  const { type } = useSelector(selectors.selectModalState);
-  const rollbar = useRollbar();
+  const { isOpened, type } = useSelector(selectors.selectModalState);
+  const dispatch = useDispatch();
 
   if (!type) {
     return null;
   }
 
+  // eslint-disable-next-line functional/no-let
+  let modalDetails;
   switch (type) {
     case addChannel:
-      return <AddChannelModal />;
+      modalDetails = <AddChannelModal />;
+      break;
     case removeChannel:
-      return <RemoveChannelModal />;
+      modalDetails = <RemoveChannelModal />;
+      break;
     case renameChannel:
-      return <RenameChannelModal />;
+      modalDetails = <RenameChannelModal />;
+      break;
     default:
-      // eslint-disable-next-line no-case-declarations
-      const err = new Error(`Undefined modal type: ${type}`);
-      rollbar.error(err);
-      throw err;
+      throw new Error(`Undefined modal type: ${type}`);
   }
+
+  return (
+    <Modal
+      show={isOpened}
+      onHide={closeModal(dispatch)}
+      centered
+    >
+      {modalDetails}
+    </Modal>
+  );
 };
 
 export default ChannelModal;

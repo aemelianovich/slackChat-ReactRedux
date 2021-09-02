@@ -3,7 +3,6 @@
 import React, {
   createContext, useContext, useEffect, useState,
 } from 'react';
-import { useRollbarPerson } from '@rollbar/react';
 
 const UserContext = createContext(null);
 
@@ -16,7 +15,6 @@ const getUser = () => {
   }
 
   const user = JSON.parse(localData);
-  useRollbarPerson(user);
   return user;
 };
 

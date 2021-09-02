@@ -1,6 +1,6 @@
-import channelsReducer, { channelActions } from './channelsSlice';
-import messagesReducer, { messageActions } from './messagesSlice';
-import modalReducer, { modalActions } from './modalSlice';
+import channelsReducer, { actions as channelActions } from './channelsSlice';
+import messagesReducer, { actions as messageActions } from './messagesSlice';
+import modalReducer, { actions as modalActions } from './modalSlice';
 import selectors from './selectors';
 
 const actions = {
