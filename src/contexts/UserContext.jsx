@@ -1,12 +1,10 @@
 // @ts-check
 
 import React, {
-  createContext, useContext, useEffect, useState,
+  createContext, useEffect, useState,
 } from 'react';
 
-const UserContext = createContext(null);
-
-export const useUserContext = () => useContext(UserContext);
+export const UserContext = createContext(null);
 
 const getUser = () => {
   const localData = localStorage.getItem('user');

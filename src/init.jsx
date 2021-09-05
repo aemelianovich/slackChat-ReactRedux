@@ -11,15 +11,14 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import '../assets/application.scss';
 import App from './components/App.jsx';
-import { SocketContext } from './components/SocketContext.jsx';
+import { SocketContext } from './contexts/SocketContext.jsx';
 import { reducer, actions } from './slices/index';
-import TimeoutError from './errors/TimeoutError';
-import SocketConnectionError from './errors/SocketConnectionError';
 import resources from './locales';
+import configureEmitMessage, { emitTypes } from './socket';
 
 export default (socket) => {
   const rollbarConfig = {
-    accessToken: '0ed50afbd64e4730b25360b9eedaf090',
+    accessToken: process.env.ROLLBAR_TOKEN,
     environment: process.env.NODE_ENV || 'development',
   };
 
@@ -35,44 +34,7 @@ export default (socket) => {
     reducer,
   });
 
-  const socketTimeout = 3000;
-
-  const emitTypes = {
-    newMessage: 'newMessage',
-    newChannel: 'newChannel',
-    renameChannel: 'renameChannel',
-    removeChannel: 'removeChannel',
-  };
-
-  const emitMessage = (emitType, data, timeout = socketTimeout) => (
-    new Promise((resolve, reject) => {
-      if (!socket) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject(new SocketConnectionError());
-      } else {
-        // eslint-disable-next-line functional/no-let
-        let called = false;
-
-        const timer = setTimeout(() => {
-          if (called) return;
-          called = true;
-          reject(new TimeoutError());
-        }, timeout);
-
-        socket.volatile.emit(emitType, data, (response) => {
-          if (called) return;
-          called = true;
-          clearTimeout(timer);
-          if (response.status === 'ok') {
-            resolve(response);
-          } else {
-            console.error(response);
-            reject(response);
-          }
-        });
-      }
-    })
-  );
+  const emitMessage = configureEmitMessage(socket);
 
   socket.on(emitTypes.newMessage, (newMessage) => {
     store.dispatch(actions.addMessage({ newMessage }));
@@ -93,7 +55,7 @@ export default (socket) => {
   return (
     <RollbarProvider config={rollbarConfig}>
       <ErrorBoundary>
-        <SocketContext.Provider value={{ emitMessage, emitTypes }}>
+        <SocketContext.Provider value={{ emitMessage }}>
           <Provider store={store}>
             <App />
           </Provider>

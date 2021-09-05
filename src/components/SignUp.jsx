@@ -1,6 +1,6 @@
 // @ts-check
 
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
@@ -8,12 +8,12 @@ import axios from 'axios';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import routes from '../routes.js';
-import { useUserContext } from './UserContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
 // @ts-ignore
 import SignUpImage from '../../assets/images/SignUpImage.jpg';
 
 const SignUp = (props) => {
-  const { setUser } = useUserContext();
+  const { setUser } = useContext(UserContext);
   const { t } = useTranslation();
 
   const SignUpSchema = Yup.object().shape({
@@ -60,7 +60,7 @@ const SignUp = (props) => {
                     setUser({ username: response.data.username, token: response.data.token });
                     props.history.push('/');
                   } catch (error) {
-                    if (error.response) {
+                    if (error.isAxiosError && error.response.status === 409) {
                       setErrors({
                         username: ' ',
                         password: ' ',
@@ -73,7 +73,6 @@ const SignUp = (props) => {
                         password: ' ',
                         confirmpassword: t('errors.generic'),
                       });
-                      console.error(error);
                       throw error;
                     }
                   }

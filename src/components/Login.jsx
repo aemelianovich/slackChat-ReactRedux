@@ -1,19 +1,19 @@
 // @ts-check
 
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Formik, Form, Field, ErrorMessage,
 } from 'formik';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUserContext } from './UserContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
 import routes from '../routes.js';
 // @ts-ignore
 import LoginChatImage from '../../assets/images/loginChat.jpg';
 
 const Login = (props) => {
-  const { setUser } = useUserContext();
+  const { setUser } = useContext(UserContext);
   const { t } = useTranslation();
 
   return (
@@ -40,10 +40,10 @@ const Login = (props) => {
                     setUser({ username: response.data.username, token: response.data.token });
                     props.history.push('/');
                   } catch (error) {
-                    if (error.response) {
+                    if (error.isAxiosError && error.response.status === 401) {
                       setErrors({
                         username: ' ',
-                        password: t('errors.password'),
+                        password: t('errors.invalidCredentials'),
                       });
                       console.error(error.response);
                     } else {
@@ -51,7 +51,6 @@ const Login = (props) => {
                         username: ' ',
                         password: t('errors.generic'),
                       });
-                      console.error(error);
                       throw error;
                     }
                   }

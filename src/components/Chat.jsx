@@ -1,14 +1,14 @@
 // @ts-nocheck
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useDispatch } from 'react-redux';
-import { useUserContext } from './UserContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
 import { actions } from '../slices';
 import Channels from './Channels.jsx';
 import Messages from './Messages.jsx';
 
 const Chat = () => {
-  const { user } = useUserContext();
+  const { user } = useContext(UserContext);
   const dispatch = useDispatch();
 
   useEffect(() => {

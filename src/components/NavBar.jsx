@@ -1,13 +1,13 @@
 // @ts-check
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUserContext } from './UserContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
 
 const NavBar = () => {
-  const { user, setUser } = useUserContext();
+  const { user, setUser } = useContext(UserContext);
   const { t } = useTranslation();
 
   const handleClick = (e) => {

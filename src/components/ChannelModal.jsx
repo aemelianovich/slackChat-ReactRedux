@@ -12,7 +12,8 @@ import {
 } from 'formik';
 import { actions, selectors } from '../slices';
 import { modalTypes } from '../slices/modalSlice.js';
-import { SocketContext } from './SocketContext.jsx';
+import { SocketContext } from '../contexts/SocketContext.jsx';
+import { emitTypes } from '../socket';
 
 const { addChannel, removeChannel, renameChannel } = modalTypes;
 
@@ -32,11 +33,7 @@ export const openModal = (type, channelId, dispatch) => () => {
   }));
 };
 
-const closeModal = (dispatch) => () => {
-  dispatch(actions.closeModal());
-};
-
-const AddChannelModal = () => {
+const AddChannelModal = ({ closeModal }) => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -44,7 +41,7 @@ const AddChannelModal = () => {
   const { type } = useSelector(selectors.selectModalState);
   const channelNames = useSelector(selectors.selectChannelNames);
 
-  const { emitMessage, emitTypes } = useContext(SocketContext);
+  const { emitMessage } = useContext(SocketContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -71,18 +68,11 @@ const AddChannelModal = () => {
             try {
               const response = await emitMessage(emitTypes.newChannel, { name: values.name });
               dispatch(actions.setCurrentChannelId({ id: response.data.id }));
-              closeModal(dispatch)();
+              closeModal();
             } catch (error) {
-              if (error.isTimeoutError || error.isSocketError) {
-                setErrors({
-                  name: error.message,
-                });
-              } else {
-                setErrors({
-                  name: t('errors.sendError'),
-                });
-              }
-              console.error(error);
+              setErrors({
+                name: t('errors.sendError'),
+              });
               throw error;
             }
           }}
@@ -104,7 +94,7 @@ const AddChannelModal = () => {
                 />
                 <ErrorMessage name="name" component="div" className="invalid-feedback" />
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -138,9 +128,8 @@ const AddChannelModal = () => {
   );
 };
 
-const RenameChannelModal = () => {
+const RenameChannelModal = ({ closeModal }) => {
   const inputRef = useRef(null);
-  const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const { type, extra } = useSelector(selectors.selectModalState);
@@ -149,7 +138,7 @@ const RenameChannelModal = () => {
   const channelNames = useSelector(selectors.selectChannelNames);
   const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
-  const { emitMessage, emitTypes } = useContext(SocketContext);
+  const { emitMessage } = useContext(SocketContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -179,18 +168,11 @@ const RenameChannelModal = () => {
                 emitTypes.renameChannel,
                 { id: currentChannel.id, name: values.name },
               );
-              closeModal(dispatch)();
+              closeModal();
             } catch (error) {
-              if (error.isTimeoutError || error.isSocketError) {
-                setErrors({
-                  name: error.message,
-                });
-              } else {
-                setErrors({
-                  name: t('errors.sendError'),
-                });
-              }
-              console.error(error);
+              setErrors({
+                name: t('errors.sendError'),
+              });
               throw error;
             }
           }}
@@ -212,7 +194,7 @@ const RenameChannelModal = () => {
                 />
                 <ErrorMessage name="name" component="div" className="invalid-feedback" />
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -246,8 +228,7 @@ const RenameChannelModal = () => {
   );
 };
 
-const RemoveChannelModal = () => {
-  const dispatch = useDispatch();
+const RemoveChannelModal = ({ closeModal }) => {
   const { t } = useTranslation();
 
   const { type, extra } = useSelector(selectors.selectModalState);
@@ -255,7 +236,7 @@ const RemoveChannelModal = () => {
   const channels = useSelector(selectors.selectChannels);
   const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
-  const { emitMessage, emitTypes } = useContext(SocketContext);
+  const { emitMessage } = useContext(SocketContext);
 
   return (
     <>
@@ -275,18 +256,11 @@ const RemoveChannelModal = () => {
           onSubmit={async ({ setErrors }) => {
             try {
               await emitMessage(emitTypes.removeChannel, { id: currentChannel.id });
-              closeModal(dispatch)();
+              closeModal();
             } catch (error) {
-              if (error.isTimeoutError || error.isSocketError) {
-                setErrors({
-                  name: error.message,
-                });
-              } else {
-                setErrors({
-                  name: t('errors.sendError'),
-                });
-              }
-              console.error(error);
+              setErrors({
+                name: t('errors.sendError'),
+              });
               throw error;
             }
           }}
@@ -304,7 +278,7 @@ const RemoveChannelModal = () => {
                 </p>
                 {errors.name && <div className="text-danger">{errors.name}</div>}
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal(dispatch)}>
+                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
                     {t(`channels.${type}.closeBtn`)}
                   </button>
                   <button
@@ -342,6 +316,10 @@ const ChannelModal = () => {
   const { isOpened, type } = useSelector(selectors.selectModalState);
   const dispatch = useDispatch();
 
+  const closeModal = () => {
+    dispatch(actions.closeModal());
+  };
+
   if (!type) {
     return null;
   }
@@ -350,13 +328,13 @@ const ChannelModal = () => {
   let modalDetails;
   switch (type) {
     case addChannel:
-      modalDetails = <AddChannelModal />;
+      modalDetails = <AddChannelModal closeModal={closeModal} />;
       break;
     case removeChannel:
-      modalDetails = <RemoveChannelModal />;
+      modalDetails = <RemoveChannelModal closeModal={closeModal} />;
       break;
     case renameChannel:
-      modalDetails = <RenameChannelModal />;
+      modalDetails = <RenameChannelModal closeModal={closeModal} />;
       break;
     default:
       throw new Error(`Undefined modal type: ${type}`);
@@ -365,7 +343,7 @@ const ChannelModal = () => {
   return (
     <Modal
       show={isOpened}
-      onHide={closeModal(dispatch)}
+      onHide={closeModal}
       centered
     >
       {modalDetails}

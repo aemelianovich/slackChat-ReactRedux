@@ -1,11 +1,11 @@
 // @ts-check
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { useUserContext } from './UserContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
 
 const PrivateRoute = ({ component: RouteComponent, ...rest }) => {
-  const { user } = useUserContext();
+  const { user } = useContext(UserContext);
 
   return (
     <Route

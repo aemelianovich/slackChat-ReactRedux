@@ -10,8 +10,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import { animateScroll as scroll } from 'react-scroll';
 import { selectors } from '../slices';
-import { useUserContext } from './UserContext.jsx';
-import { SocketContext } from './SocketContext.jsx';
+import { UserContext } from '../contexts/UserContext.jsx';
+import { SocketContext } from '../contexts/SocketContext.jsx';
+import { emitTypes } from '../socket';
 
 const ChannelInfo = () => {
   const channel = useSelector(selectors.selectCurrentChannel);
@@ -37,10 +38,10 @@ const Message = ({ message }) => (
 );
 
 const NewMessage = () => {
-  const { user } = useUserContext();
+  const { user } = useContext(UserContext);
   const channel = useSelector(selectors.selectCurrentChannel);
   const inputRef = useRef(null);
-  const { emitMessage, emitTypes } = useContext(SocketContext);
+  const { emitMessage } = useContext(SocketContext);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -72,7 +73,6 @@ const NewMessage = () => {
                 message: t('errors.sendError'),
               });
             }
-            console.error(error);
             throw error;
           }
         }}

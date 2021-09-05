@@ -13,7 +13,7 @@ import NavBar from './NavBar.jsx';
 import Chat from './Chat.jsx';
 import ChannelModal from './ChannelModal.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
-import UserContextProvider from './UserContext.jsx';
+import UserContextProvider from '../contexts/UserContext.jsx';
 
 const App = () => (
   <BrowserRouter>
