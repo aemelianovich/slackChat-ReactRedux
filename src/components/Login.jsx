@@ -81,7 +81,7 @@ const Login = (props) => {
                         }
                         ref={usernameRef}
                       />
-                      <Form.Label aria-labelledby="username">{t('login.username')}</Form.Label>
+                      <Form.Label htmlFor="username">{t('login.username')}</Form.Label>
                     </Form.Group>
                     <Form.Group className="form-floating mb-4">
                       <Form.Control
@@ -98,7 +98,7 @@ const Login = (props) => {
                           (!!touched.password && !!errors.password) || !!authErrorMsg
                         }
                       />
-                      <Form.Label aria-labelledby="password">{t('login.password')}</Form.Label>
+                      <Form.Label htmlFor="password">{t('login.password')}</Form.Label>
                       <Form.Control.Feedback type="invalid" tooltip>
                         {errors.password || authErrorMsg}
                       </Form.Control.Feedback>
