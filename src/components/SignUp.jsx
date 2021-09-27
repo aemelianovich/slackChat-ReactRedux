@@ -100,7 +100,7 @@ const SignUp = (props) => {
                         }
                         ref={usernameRef}
                       />
-                      <Form.Label>{t('signUp.username')}</Form.Label>
+                      <Form.Label htmlFor="username">{t('signUp.username')}</Form.Label>
                       <Form.Control.Feedback type="invalid" tooltip>
                         {errors.username}
                       </Form.Control.Feedback>
@@ -122,7 +122,7 @@ const SignUp = (props) => {
                         }
                         aria-autocomplete="list"
                       />
-                      <Form.Label>{t('signUp.password')}</Form.Label>
+                      <Form.Label htmlFor="password">{t('signUp.password')}</Form.Label>
                       <Form.Control.Feedback type="invalid" tooltip>
                         {errors.password}
                       </Form.Control.Feedback>
@@ -142,7 +142,7 @@ const SignUp = (props) => {
                           (!!touched.confirmpassword && !!errors.confirmpassword) || !!authErrorMsg
                         }
                       />
-                      <Form.Label>{t('signUp.confirmPassword')}</Form.Label>
+                      <Form.Label htmlFor="confirmpassword">{t('signUp.confirmPassword')}</Form.Label>
                       <Form.Control.Feedback type="invalid" tooltip>
                         {errors.confirmpassword || authErrorMsg}
                       </Form.Control.Feedback>
