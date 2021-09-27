@@ -14,6 +14,7 @@ import Chat from './Chat.jsx';
 import ChannelModal from './ChannelModal.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
 import UserContextProvider from '../contexts/UserContext.jsx';
+import routes from '../routes.js';
 
 const App = () => (
   <BrowserRouter>
@@ -22,10 +23,10 @@ const App = () => (
         <ChannelModal />
         <NavBar />
         <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={SignUp} />
-          <PrivateRoute exact path="/" component={Chat} />
-          <Route path="*" component={Page404} />
+          <Route path={routes.loginPagePath()} component={Login} />
+          <Route path={routes.signupPagePath()} component={SignUp} />
+          <PrivateRoute exact path={routes.chatPagePath()} component={Chat} />
+          <Route path={routes.page404Path()} component={Page404} />
         </Switch>
       </UserContextProvider>
     </div>

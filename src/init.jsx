@@ -14,7 +14,8 @@ import App from './components/App.jsx';
 import { SocketContext } from './contexts/SocketContext.jsx';
 import { reducer, actions } from './slices/index';
 import resources from './locales';
-import configureEmitMessage, { emitTypes } from './socket';
+import TimeoutError from './errors/TimeoutError';
+import { emitTypes, socketTimeout } from './constants';
 
 export default (socket) => {
   const rollbarConfig = {
@@ -34,7 +35,35 @@ export default (socket) => {
     reducer,
   });
 
-  const emitMessage = configureEmitMessage(socket);
+  const emitMessage = (emitType, data, timeout) => (
+    new Promise((resolve, reject) => {
+      // eslint-disable-next-line functional/no-let
+      let called = false;
+      const timer = setTimeout(() => {
+        if (called) return;
+        called = true;
+        reject(new TimeoutError());
+      }, timeout);
+      socket.volatile.emit(emitType, data, (response) => {
+        if (called) return;
+        called = true;
+        clearTimeout(timer);
+        if (response.status === 'ok') {
+          resolve(response);
+        } else {
+          console.error(response);
+          reject(response);
+        }
+      });
+    })
+  );
+
+  const emitApi = {
+    newMessage: (data) => emitMessage(emitTypes.newMessage, data, socketTimeout),
+    newChannel: (data) => emitMessage(emitTypes.newChannel, data, socketTimeout),
+    renameChannel: (data) => emitMessage(emitTypes.renameChannel, data, socketTimeout),
+    removeChannel: (data) => emitMessage(emitTypes.removeChannel, data, socketTimeout),
+  };
 
   socket.on(emitTypes.newMessage, (newMessage) => {
     store.dispatch(actions.addMessage({ newMessage }));
@@ -55,7 +84,7 @@ export default (socket) => {
   return (
     <RollbarProvider config={rollbarConfig}>
       <ErrorBoundary>
-        <SocketContext.Provider value={{ emitMessage }}>
+        <SocketContext.Provider value={{ emitApi }}>
           <Provider store={store}>
             <App />
           </Provider>

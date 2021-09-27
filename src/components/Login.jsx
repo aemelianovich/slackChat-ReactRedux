@@ -1,9 +1,10 @@
 // @ts-check
 
-import React, { useContext } from 'react';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
+import React, {
+  useContext, useRef, useEffect, useState,
+} from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { Formik } from 'formik';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,12 @@ import LoginChatImage from '../../assets/images/loginChat.jpg';
 const Login = (props) => {
   const { setUser } = useContext(UserContext);
   const { t } = useTranslation();
+  const usernameRef = useRef(null);
+  const [authErrorMsg, setAuthErrorMsg] = useState('');
+
+  useEffect(() => {
+    usernameRef.current?.focus();
+  });
 
   return (
     <div className="container-fluid h-100">
@@ -30,7 +37,7 @@ const Login = (props) => {
                   username: '',
                   password: '',
                 }}
-                onSubmit={async (values, { setErrors }) => {
+                onSubmit={async (values) => {
                   try {
                     const response = await axios.post(
                       routes.loginPath(),
@@ -38,53 +45,65 @@ const Login = (props) => {
                     );
 
                     setUser({ username: response.data.username, token: response.data.token });
-                    props.history.push('/');
+                    props.history.push(routes.chatPagePath());
                   } catch (error) {
+                    usernameRef.current?.focus();
+                    usernameRef.current?.select();
                     if (error.isAxiosError && error.response.status === 401) {
-                      setErrors({
-                        username: ' ',
-                        password: t('errors.invalidCredentials'),
-                      });
+                      setAuthErrorMsg(t('errors.invalidCredentials'));
                       console.error(error.response);
                     } else {
-                      setErrors({
-                        username: ' ',
-                        password: t('errors.generic'),
-                      });
+                      setAuthErrorMsg(t('errors.generic'));
                       throw error;
                     }
                   }
                 }}
 
               >
-                {({ isSubmitting, errors, touched }) => (
-                  <Form className="col-12 col-md-6 mt-3 mt-mb-0">
+                {({
+                  isSubmitting, errors, touched, handleChange, values, handleSubmit, handleBlur,
+                }) => (
+                  <Form className="col-12 col-md-6 mt-3 mt-mb-0" onSubmit={handleSubmit}>
                     <h1 className="text-center mb-4">{t('login.enter')}</h1>
-                    <div className="form-floating mb-3 form-group">
-                      <Field
+                    <Form.Group className="form-floating mb-3">
+                      <Form.Control
                         name="username"
+                        type="text"
                         autoComplete="username"
                         required
                         placeholder={t('login.username')}
                         id="username"
-                        className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
+                        value={values.username}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={
+                          (!!touched.username && !!errors.username) || !!authErrorMsg
+                        }
+                        ref={usernameRef}
                       />
-                      <label className="form-label" htmlFor="username">{t('login.username')}</label>
-                    </div>
-                    <div className="form-floating mb-4 form-group">
-                      <Field
+                      <Form.Label>{t('login.username')}</Form.Label>
+                    </Form.Group>
+                    <Form.Group className="form-floating mb-4">
+                      <Form.Control
                         name="password"
                         autoComplete="current-password"
                         required
                         placeholder={t('login.password')}
                         type="password"
                         id="password"
-                        className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={
+                          (!!touched.password && !!errors.password) || !!authErrorMsg
+                        }
                       />
-                      <label className="form-label" htmlFor="password">{t('login.password')}</label>
-                      <ErrorMessage name="password" component="div" className="invalid-feedback" />
-                    </div>
-                    <button type="submit" disabled={isSubmitting} className="w-100 mb-3 btn btn-outline-primary">{t('login.enter')}</button>
+                      <Form.Label>{t('login.password')}</Form.Label>
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {errors.password || authErrorMsg}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Button type="submit" variant="outline-primary" disabled={isSubmitting} className="w-100 mb-3">{t('login.enter')}</Button>
                   </Form>
                 )}
               </Formik>
@@ -93,7 +112,7 @@ const Login = (props) => {
               <div className="text-center">
                 <span>{t('login.noUsername')}</span>
                 {' '}
-                <Link to="/signup">{t('login.registration')}</Link>
+                <Link to={routes.signupPagePath()}>{t('login.registration')}</Link>
               </div>
             </div>
           </div>

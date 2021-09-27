@@ -3,45 +3,31 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Modal, Spinner,
+  Modal, Spinner, Form, Button,
 } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
+import { Formik, ErrorMessage } from 'formik';
 import { actions, selectors } from '../slices';
 import { modalTypes } from '../slices/modalSlice.js';
 import { SocketContext } from '../contexts/SocketContext.jsx';
-import { emitTypes } from '../socket';
 
-const { addChannel, removeChannel, renameChannel } = modalTypes;
-
-const getValidationSchema = (type, channelNames, t) => Yup.object().shape({
+const getValidationSchema = (channelNames, t) => Yup.object().shape({
   name: Yup.string()
-    .required(t(`channels.${type}.requiredName`))
-    .min(3, t(`channels.${type}.nameLength`))
-    .max(20, t(`channels.${type}.nameLength`))
-    .notOneOf(channelNames, t(`channels.${type}.uniqueName`)),
+    .required(t('modals.requiredName'))
+    .min(3, t('modals.nameLength'))
+    .max(20, t('modals.nameLength'))
+    .notOneOf(channelNames, t('modals.uniqueName')),
 });
-
-export const openModal = (type, channelId, dispatch) => () => {
-  const extra = channelId ? { channelId } : null;
-  dispatch(actions.openModal({
-    type,
-    extra,
-  }));
-};
 
 const AddChannelModal = ({ closeModal }) => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  const { type } = useSelector(selectors.selectModalState);
   const channelNames = useSelector(selectors.selectChannelNames);
 
-  const { emitMessage } = useContext(SocketContext);
+  const { emitApi } = useContext(SocketContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -53,20 +39,18 @@ const AddChannelModal = ({ closeModal }) => {
     <>
       <Modal.Header closeButton>
         <Modal.Title>
-          <h4>{t(`channels.${type}.title`)}</h4>
+          <h4>{t('modals.addChannelTitle')}</h4>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{
-            name: '',
-          }}
-          validationSchema={getValidationSchema(type, channelNames, t)}
+          initialValues={{ name: '' }}
+          validationSchema={getValidationSchema(channelNames, t)}
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={async (values, { setErrors }) => {
             try {
-              const response = await emitMessage(emitTypes.newChannel, { name: values.name });
+              const response = await emitApi.newChannel({ name: values.name });
               dispatch(actions.setCurrentChannelId({ id: response.data.id }));
               closeModal();
             } catch (error) {
@@ -78,29 +62,35 @@ const AddChannelModal = ({ closeModal }) => {
           }}
         >
           {({
-            isSubmitting, errors, touched,
+            isSubmitting, errors, touched, handleChange, values, handleSubmit, handleBlur,
           }) => (
-            <Form>
-              <div className="form-group">
-                <Field
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Control
                   name="name"
                   autoComplete="name"
                   id="name"
-                  className={`mb-2 form-control${errors.name && touched.name ? ' is-invalid' : ''}`}
+                  className="mb-2"
+                  isInvalid={!!touched.name && !!errors.name}
                   autoFocus
                   disabled={isSubmitting}
                   data-testid="add-channel"
-                  innerRef={inputRef}
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  ref={inputRef}
                 />
-                <ErrorMessage name="name" component="div" className="invalid-feedback" />
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
-                    {t(`channels.${type}.closeBtn`)}
-                  </button>
-                  <button
+                  <Button type="button" variant="secondary" className="me-2" onClick={closeModal}>
+                    {t('modals.closeBtn')}
+                  </Button>
+                  <Button
                     type="submit"
+                    variant="primary"
                     disabled={isSubmitting}
-                    className="btn btn-primary"
                   >
                     {
                       isSubmitting
@@ -116,10 +106,10 @@ const AddChannelModal = ({ closeModal }) => {
                         )
                         : null
                       }
-                    {t(`channels.${type}.submitBtn`)}
-                  </button>
+                    {t('modals.submitBtn')}
+                  </Button>
                 </div>
-              </div>
+              </Form.Group>
             </Form>
           )}
         </Formik>
@@ -132,13 +122,13 @@ const RenameChannelModal = ({ closeModal }) => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
 
-  const { type, extra } = useSelector(selectors.selectModalState);
+  const { extra } = useSelector(selectors.selectModalState);
 
   const channels = useSelector(selectors.selectChannels);
   const channelNames = useSelector(selectors.selectChannelNames);
   const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
-  const { emitMessage } = useContext(SocketContext);
+  const { emitApi } = useContext(SocketContext);
 
   useEffect(() => {
     setTimeout(() => {
@@ -151,23 +141,18 @@ const RenameChannelModal = ({ closeModal }) => {
     <>
       <Modal.Header closeButton>
         <Modal.Title>
-          <h4>{t(`channels.${type}.title`)}</h4>
+          <h4>{t('modals.renameChannelTitle')}</h4>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{
-            name: currentChannel.name,
-          }}
-          validationSchema={getValidationSchema(type, channelNames, t)}
+          initialValues={{ name: currentChannel.name }}
+          validationSchema={getValidationSchema(channelNames, t)}
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={async (values, { setErrors }) => {
             try {
-              await emitMessage(
-                emitTypes.renameChannel,
-                { id: currentChannel.id, name: values.name },
-              );
+              await emitApi.renameChannel({ id: currentChannel.id, name: values.name });
               closeModal();
             } catch (error) {
               setErrors({
@@ -178,29 +163,35 @@ const RenameChannelModal = ({ closeModal }) => {
           }}
         >
           {({
-            isSubmitting, errors, touched,
+            isSubmitting, errors, touched, handleChange, values, handleSubmit, handleBlur,
           }) => (
-            <Form>
-              <div className="form-group">
-                <Field
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Control
                   name="name"
                   autoComplete="name"
                   id="name"
-                  className={`mb-2 form-control${errors.name && touched.name ? ' is-invalid' : ''}`}
+                  className="mb-2"
+                  isInvalid={!!touched.name && !!errors.name}
                   autoFocus
                   disabled={isSubmitting}
                   data-testid="rename-channel"
-                  innerRef={inputRef}
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  ref={inputRef}
                 />
-                <ErrorMessage name="name" component="div" className="invalid-feedback" />
+                <Form.Control.Feedback type="invalid">
+                  {errors.name}
+                </Form.Control.Feedback>
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
-                    {t(`channels.${type}.closeBtn`)}
-                  </button>
-                  <button
+                  <Button type="button" variant="secondary" className="me-2" onClick={closeModal}>
+                    {t('modals.closeBtn')}
+                  </Button>
+                  <Button
                     type="submit"
+                    variant="primary"
                     disabled={isSubmitting}
-                    className="btn btn-primary"
                   >
                     {
                       isSubmitting
@@ -216,10 +207,10 @@ const RenameChannelModal = ({ closeModal }) => {
                         )
                         : null
                       }
-                    {t(`channels.${type}.submitBtn`)}
-                  </button>
+                    {t('modals.submitBtn')}
+                  </Button>
                 </div>
-              </div>
+              </Form.Group>
             </Form>
           )}
         </Formik>
@@ -231,31 +222,29 @@ const RenameChannelModal = ({ closeModal }) => {
 const RemoveChannelModal = ({ closeModal }) => {
   const { t } = useTranslation();
 
-  const { type, extra } = useSelector(selectors.selectModalState);
+  const { extra } = useSelector(selectors.selectModalState);
 
   const channels = useSelector(selectors.selectChannels);
   const currentChannel = channels.find((channel) => channel.id === extra.channelId);
 
-  const { emitMessage } = useContext(SocketContext);
+  const { emitApi } = useContext(SocketContext);
 
   return (
     <>
       <Modal.Header closeButton>
         <Modal.Title>
-          <h4>{t(`channels.${type}.title`)}</h4>
+          <h4>{t('modals.removeChannelTitle')}</h4>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Formik
-          initialValues={{
-            name: currentChannel.name,
-          }}
+          initialValues={{ name: currentChannel.name }}
           validationSchema={null}
           validateOnChange={false}
           validateOnBlur={false}
-          onSubmit={async ({ setErrors }) => {
+          onSubmit={async (values, { setErrors }) => {
             try {
-              await emitMessage(emitTypes.removeChannel, { id: currentChannel.id });
+              await emitApi.removeChannel({ id: currentChannel.id });
               closeModal();
             } catch (error) {
               setErrors({
@@ -266,25 +255,26 @@ const RemoveChannelModal = ({ closeModal }) => {
           }}
         >
           {({
-            isSubmitting, errors,
+            isSubmitting, handleSubmit,
           }) => (
-            <Form>
-              <div className="form-group">
-                <p
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Label
+                  type="text"
                   className="lead"
                   data-testid="remove-channel"
                 >
-                  {t(`channels.${type}.question`)}
-                </p>
-                {errors.name && <div className="text-danger">{errors.name}</div>}
+                  {t('modals.removeQuestion')}
+                </Form.Label>
+                <ErrorMessage name="name" component="div" className="text-danger" />
                 <div className="d-flex justify-content-end">
-                  <button type="button" className="me-2 btn btn-secondary" onClick={closeModal}>
-                    {t(`channels.${type}.closeBtn`)}
-                  </button>
-                  <button
+                  <Button type="button" variant="secondary" className="me-2" onClick={closeModal}>
+                    {t('modals.closeBtn')}
+                  </Button>
+                  <Button
                     type="submit"
+                    variant="danger"
                     disabled={isSubmitting}
-                    className="btn btn-danger"
                   >
                     {
                       isSubmitting
@@ -300,10 +290,10 @@ const RemoveChannelModal = ({ closeModal }) => {
                         )
                         : null
                       }
-                    {t(`channels.${type}.submitBtn`)}
-                  </button>
+                    {t('modals.removeBtn')}
+                  </Button>
                 </div>
-              </div>
+              </Form.Group>
             </Form>
           )}
         </Formik>
@@ -325,20 +315,10 @@ const ChannelModal = () => {
   }
 
   // eslint-disable-next-line functional/no-let
-  let modalDetails;
-  switch (type) {
-    case addChannel:
-      modalDetails = <AddChannelModal closeModal={closeModal} />;
-      break;
-    case removeChannel:
-      modalDetails = <RemoveChannelModal closeModal={closeModal} />;
-      break;
-    case renameChannel:
-      modalDetails = <RenameChannelModal closeModal={closeModal} />;
-      break;
-    default:
-      throw new Error(`Undefined modal type: ${type}`);
-  }
+  const modalWindowByType = {};
+  modalWindowByType[modalTypes.addChannel] = <AddChannelModal closeModal={closeModal} />;
+  modalWindowByType[modalTypes.removeChannel] = <RemoveChannelModal closeModal={closeModal} />;
+  modalWindowByType[modalTypes.renameChannel] = <RenameChannelModal closeModal={closeModal} />;
 
   return (
     <Modal
@@ -346,7 +326,7 @@ const ChannelModal = () => {
       onHide={closeModal}
       centered
     >
-      {modalDetails}
+      {modalWindowByType[type]}
     </Modal>
   );
 };

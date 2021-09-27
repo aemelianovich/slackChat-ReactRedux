@@ -1,9 +1,10 @@
 // @ts-check
 
-import React, { useContext } from 'react';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
+import React, {
+  useContext, useRef, useEffect, useState,
+} from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { Formik } from 'formik';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,12 @@ import SignUpImage from '../../assets/images/SignUpImage.jpg';
 const SignUp = (props) => {
   const { setUser } = useContext(UserContext);
   const { t } = useTranslation();
+  const usernameRef = useRef(null);
+  const [authErrorMsg, setAuthErrorMsg] = useState('');
+
+  useEffect(() => {
+    usernameRef.current?.focus();
+  });
 
   const SignUpSchema = Yup.object().shape({
     username: Yup.string()
@@ -44,7 +51,7 @@ const SignUp = (props) => {
                   confirmpassword: '',
                 }}
                 validationSchema={SignUpSchema}
-                onSubmit={async (values, { setErrors }) => {
+                onSubmit={async (values) => {
                   try {
                     const data = {
                       username: values.username,
@@ -58,45 +65,48 @@ const SignUp = (props) => {
 
                     // alert(JSON.stringify(response, null, 2));
                     setUser({ username: response.data.username, token: response.data.token });
-                    props.history.push('/');
+                    props.history.push(routes.chatPagePath());
                   } catch (error) {
+                    usernameRef.current?.focus();
+                    usernameRef.current?.select();
                     if (error.isAxiosError && error.response.status === 409) {
-                      setErrors({
-                        username: ' ',
-                        password: ' ',
-                        confirmpassword: t('errors.existingUser'),
-                      });
+                      setAuthErrorMsg(t('errors.existingUser'));
                       console.error(error.response);
                     } else {
-                      setErrors({
-                        username: ' ',
-                        password: ' ',
-                        confirmpassword: t('errors.generic'),
-                      });
+                      setAuthErrorMsg(t('errors.generic'));
                       throw error;
                     }
                   }
                 }}
               >
                 {({
-                  isSubmitting, errors, touched,
+                  isSubmitting, errors, touched, handleChange, values, handleSubmit, handleBlur,
                 }) => (
-                  <Form className="w-50">
+                  <Form className="w-50" onSubmit={handleSubmit}>
                     <h1 className="text-center mb-4">{t('signUp.title')}</h1>
-                    <div className="form-floating mb-3 form-group">
-                      <Field
+                    <Form.Group className="form-floating mb-3">
+                      <Form.Control
                         placeholder={t('signUp.username')}
                         name="username"
+                        type="text"
                         autoComplete="username"
                         required
                         id="username"
-                        className={`form-control${errors.username && touched.username ? ' is-invalid' : ''}`}
+                        value={values.username}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={
+                          (!!touched.username && !!errors.username) || !!authErrorMsg
+                        }
+                        ref={usernameRef}
                       />
-                      <label className="form-label" htmlFor="username">{t('signUp.username')}</label>
-                      <ErrorMessage name="username" component="div" className="invalid-feedback" />
-                    </div>
-                    <div className="form-floating mb-3 form-group">
-                      <Field
+                      <Form.Label>{t('signUp.username')}</Form.Label>
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {errors.username}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="form-floating mb-3">
+                      <Form.Control
                         placeholder={t('signUp.password')}
                         name="password"
                         aria-describedby="passwordHelpBlock"
@@ -104,28 +114,42 @@ const SignUp = (props) => {
                         autoComplete="new-password"
                         type="password"
                         id="password"
-                        className={`form-control${errors.password && touched.password ? ' is-invalid' : ''}`}
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={
+                          (!!touched.password && !!errors.password) || !!authErrorMsg
+                        }
                         aria-autocomplete="list"
                       />
-                      <label className="form-label" htmlFor="password">{t('signUp.password')}</label>
-                      <ErrorMessage name="password" component="div" className="invalid-feedback" />
-                    </div>
-                    <div className="form-floating mb-4 form-group">
-                      <Field
+                      <Form.Label>{t('signUp.password')}</Form.Label>
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {errors.password}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="form-floating mb-4">
+                      <Form.Control
                         placeholder={t('signUp.confirmPassword')}
                         name="confirmpassword"
                         required
                         autoComplete="new-password"
                         type="password"
                         id="confirmpassword"
-                        className={`form-control${errors.confirmpassword && touched.confirmpassword ? ' is-invalid' : ''}`}
+                        value={values.confirmpassword}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        isInvalid={
+                          (!!touched.confirmpassword && !!errors.confirmpassword) || !!authErrorMsg
+                        }
                       />
-                      <label className="form-label" htmlFor="confirmpassword">{t('signUp.confirmPassword')}</label>
-                      <ErrorMessage name="confirmpassword" component="div" className="invalid-feedback" />
-                    </div>
-                    <button type="submit" disabled={isSubmitting} className="w-100 btn btn-outline-primary">
+                      <Form.Label>{t('signUp.confirmPassword')}</Form.Label>
+                      <Form.Control.Feedback type="invalid" tooltip>
+                        {errors.confirmpassword || authErrorMsg}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Button type="submit" variant="outline-primary" disabled={isSubmitting} className="w-100">
                       {t('signUp.register')}
-                    </button>
+                    </Button>
                   </Form>
                 )}
               </Formik>

@@ -13,7 +13,7 @@ const Chat = () => {
 
   useEffect(() => {
     dispatch(actions.fetchInitData(user));
-  }, [user]);
+  }, [user, dispatch]);
 
   return (
     <div className="h-100 my-4 overflow-hidden rounded shadow container">

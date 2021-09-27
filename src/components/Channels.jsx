@@ -9,7 +9,6 @@ import * as Icon from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { actions, selectors } from '../slices';
 import { modalTypes } from '../slices/modalSlice.js';
-import { openModal } from './ChannelModal.jsx';
 
 const { addChannel, removeChannel, renameChannel } = modalTypes;
 
@@ -17,6 +16,15 @@ const Channel = ({ channel }) => {
   const currentChannel = useSelector(selectors.selectCurrentChannel);
   const { t } = useTranslation();
   const dispatch = useDispatch();
+
+  const openModal = (type, channelId) => () => {
+    const extra = channelId ? { channelId } : null;
+    dispatch(actions.openModal({
+      type,
+      extra,
+    }));
+  };
+
   return (
     <Nav.Item as="li" className="w-100">
       {channel.removable
@@ -47,15 +55,15 @@ const Channel = ({ channel }) => {
             <Dropdown.Menu>
               <Dropdown.Item
                 href="#"
-                onClick={openModal(removeChannel, channel.id, dispatch)}
+                onClick={openModal(removeChannel, channel.id)}
               >
-                {t('channels.removeChannel.dropDownTitle')}
+                {t('channels.removeOption')}
               </Dropdown.Item>
               <Dropdown.Item
                 href="#"
-                onClick={openModal(renameChannel, channel.id, dispatch)}
+                onClick={openModal(renameChannel, channel.id)}
               >
-                {t('channels.renameChannel.dropDownTitle')}
+                {t('channels.renameOption')}
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -81,11 +89,18 @@ const Channels = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
+  const openModal = (type) => () => {
+    dispatch(actions.openModal({
+      type,
+      extra: null,
+    }));
+  };
+
   return (
     <div className="d-flex flex-column h-100 col-4 col-md-2 border-right pt-5 px-0 bg-light">
       <div className="d-flex justify-content-between mb-2 ps-4 pe-2">
         <span>{t('channels.title')}</span>
-        <Button variant="group-vertical" className="p-0 text-primary" onClick={openModal(addChannel, null, dispatch)}>
+        <Button variant="group-vertical" className="p-0 text-primary" onClick={openModal(addChannel)}>
           <Icon.PlusSquare />
           <span className="visually-hidden">+</span>
         </Button>

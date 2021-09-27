@@ -1,18 +1,15 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Card, Button, InputGroup, Spinner,
+  Card, Button, InputGroup, Spinner, Form,
 } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
+import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { animateScroll as scroll } from 'react-scroll';
 import { selectors } from '../slices';
 import { UserContext } from '../contexts/UserContext.jsx';
 import { SocketContext } from '../contexts/SocketContext.jsx';
-import { emitTypes } from '../socket';
 
 const ChannelInfo = () => {
   const channel = useSelector(selectors.selectCurrentChannel);
@@ -41,7 +38,7 @@ const NewMessage = () => {
   const { user } = useContext(UserContext);
   const channel = useSelector(selectors.selectCurrentChannel);
   const inputRef = useRef(null);
-  const { emitMessage } = useContext(SocketContext);
+  const { emitApi } = useContext(SocketContext);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -61,7 +58,7 @@ const NewMessage = () => {
               channelId: channel?.id,
               username: user.username,
             };
-            await emitMessage(emitTypes.newMessage, newMessage);
+            await emitApi.newMessage(newMessage);
             resetForm();
           } catch (error) {
             if (error.isTimeoutError || error.isSocketError) {
@@ -78,21 +75,24 @@ const NewMessage = () => {
         }}
       >
         {({
-          isSubmitting, values, errors, touched,
+          isSubmitting, errors, touched, handleChange, values, handleSubmit, handleBlur,
         }) => (
-          <Form className="py-1 border rounded-2" noValidate>
-            <InputGroup className="has-validation pl-2 pr-0">
-              <Field
+          <Form className="py-1 border rounded-2" noValidate onSubmit={handleSubmit}>
+            <InputGroup className="pl-2 pr-0" hasValidation>
+              <Form.Control
                 name="message"
                 autoComplete="message"
                 data-testid="new-message"
                 placeholder={t('messages.newMessage')}
                 id="new-message"
-                className={`border-0 p-0 ps-2 form-control${errors.message && touched.message ? ' is-invalid' : ''}`}
+                className="border-0 p-0 ps-2"
+                isInvalid={!!touched.message && !!errors.message}
                 disabled={isSubmitting}
-                innerRef={inputRef}
+                value={values.message}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                ref={inputRef}
               />
-              <ErrorMessage name="message" component="div" className="invalid-feedback" />
               <Button
                 type="submit"
                 variant="group-vertical"
@@ -113,6 +113,9 @@ const NewMessage = () => {
               }
                 <span className="visually-hidden">{t('messages.sendMessageBtn')}</span>
               </Button>
+              <Form.Control.Feedback type="invalid">
+                {errors.message}
+              </Form.Control.Feedback>
             </InputGroup>
           </Form>
         )}
