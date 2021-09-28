@@ -96,6 +96,7 @@ const NewMessage = () => {
               <Button
                 type="submit"
                 variant="group-vertical"
+                htmlFor="new-message"
                 disabled={isSubmitting || (values.message.length === 0)}
               >
                 {
