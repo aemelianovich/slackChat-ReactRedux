@@ -90,7 +90,6 @@ const AddChannelModal = ({ closeModal }) => {
                   <Button
                     type="submit"
                     variant="primary"
-                    htmlFor="name"
                     disabled={isSubmitting}
                   >
                     {
