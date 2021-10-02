@@ -132,7 +132,7 @@ const Messages = () => {
   }, [messages]);
 
   return (
-    <div className="col p-0 h-100">
+    <>
       <div className="d-flex flex-column h-100">
         <ChannelInfo />
         <div
@@ -148,7 +148,7 @@ const Messages = () => {
         </div>
         <NewMessage />
       </div>
-    </div>
+    </>
   );
 };
 
