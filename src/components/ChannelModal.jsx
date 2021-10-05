@@ -316,9 +316,11 @@ const ChannelModal = () => {
 
   // eslint-disable-next-line functional/no-let
   const modalWindowByType = {};
-  modalWindowByType[modalTypes.addChannel] = <AddChannelModal closeModal={closeModal} />;
-  modalWindowByType[modalTypes.removeChannel] = <RemoveChannelModal closeModal={closeModal} />;
-  modalWindowByType[modalTypes.renameChannel] = <RenameChannelModal closeModal={closeModal} />;
+  modalWindowByType[modalTypes.addChannel] = AddChannelModal;
+  modalWindowByType[modalTypes.removeChannel] = RemoveChannelModal;
+  modalWindowByType[modalTypes.renameChannel] = RenameChannelModal;
+
+  const ModalWindow = modalWindowByType[type];
 
   return (
     <Modal
@@ -326,7 +328,7 @@ const ChannelModal = () => {
       onHide={closeModal}
       centered
     >
-      {modalWindowByType[type]}
+      <ModalWindow closeModal={closeModal} />
     </Modal>
   );
 };

@@ -2,8 +2,8 @@
 
 import 'core-js/stable/index.js';
 import 'regenerator-runtime/runtime.js';
-import React from 'react';
-import i18n from 'i18next';
+import React, { Suspense } from 'react';
+import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import { Provider } from 'react-redux';
@@ -17,19 +17,21 @@ import resources from './locales';
 import TimeoutError from './errors/TimeoutError';
 import { emitTypes, socketTimeout } from './constants';
 
+const i18n = i18next.createInstance();
+
+i18n
+  .use(initReactI18next)
+  .init({
+    lng: 'ru',
+    debug: !(process.env.NODE_ENV === 'production'),
+    resources,
+  });
+
 export default (socket) => {
   const rollbarConfig = {
     accessToken: process.env.ROLLBAR_TOKEN,
     environment: process.env.NODE_ENV || 'development',
   };
-
-  i18n
-    .use(initReactI18next)
-    .init({
-      lng: 'ru',
-      debug: !(process.env.NODE_ENV === 'production'),
-      resources,
-    });
 
   const store = configureStore({
     reducer,
@@ -86,7 +88,9 @@ export default (socket) => {
       <ErrorBoundary>
         <SocketContext.Provider value={{ emitApi }}>
           <Provider store={store}>
-            <App />
+            <Suspense fallback="loading...">
+              <App />
+            </Suspense>
           </Provider>
         </SocketContext.Provider>
       </ErrorBoundary>
