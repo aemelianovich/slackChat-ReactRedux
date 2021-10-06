@@ -302,6 +302,12 @@ const RemoveChannelModal = ({ closeModal }) => {
   );
 };
 
+const modalWindowByType = {
+  [modalTypes.addChannel]: AddChannelModal,
+  [modalTypes.removeChannel]: RemoveChannelModal,
+  [modalTypes.renameChannel]: RenameChannelModal,
+};
+
 const ChannelModal = () => {
   const { isOpened, type } = useSelector(selectors.selectModalState);
   const dispatch = useDispatch();
@@ -313,12 +319,6 @@ const ChannelModal = () => {
   if (!type) {
     return null;
   }
-
-  // eslint-disable-next-line functional/no-let
-  const modalWindowByType = {};
-  modalWindowByType[modalTypes.addChannel] = AddChannelModal;
-  modalWindowByType[modalTypes.removeChannel] = RemoveChannelModal;
-  modalWindowByType[modalTypes.renameChannel] = RenameChannelModal;
 
   const ModalWindow = modalWindowByType[type];
 

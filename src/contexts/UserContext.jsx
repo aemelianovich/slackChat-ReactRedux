@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 // @ts-check
 
 import React, {
