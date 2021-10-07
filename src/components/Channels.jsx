@@ -48,13 +48,11 @@ const Channel = ({
 
           <Dropdown.Menu>
             <Dropdown.Item
-              href="#"
               onClick={openRemoveModal(channel.id)}
             >
               {t('channels.removeOption')}
             </Dropdown.Item>
             <Dropdown.Item
-              href="#"
               onClick={openRenameModal(channel.id)}
             >
               {t('channels.renameOption')}

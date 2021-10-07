@@ -37,10 +37,17 @@ const AddChannelModal = ({ closeModal }) => {
 
   return (
     <>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>
           <h4>{t('modals.addChannelTitle')}</h4>
         </Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={closeModal}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
       </Modal.Header>
       <Modal.Body>
         <Formik
@@ -139,10 +146,17 @@ const RenameChannelModal = ({ closeModal }) => {
 
   return (
     <>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>
           <h4>{t('modals.renameChannelTitle')}</h4>
         </Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={closeModal}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
       </Modal.Header>
       <Modal.Body>
         <Formik
@@ -231,10 +245,17 @@ const RemoveChannelModal = ({ closeModal }) => {
 
   return (
     <>
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>
           <h4>{t('modals.removeChannelTitle')}</h4>
         </Modal.Title>
+        <Button
+          variant="close"
+          type="button"
+          onClick={closeModal}
+          aria-label="Close"
+          data-bs-dismiss="modal"
+        />
       </Modal.Header>
       <Modal.Body>
         <Formik
