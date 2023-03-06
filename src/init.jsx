@@ -23,7 +23,7 @@ export default async (socket) => {
   await i18n
     .use(initReactI18next)
     .init({
-      lng: 'ru',
+      lng: 'en',
       debug: !(process.env.NODE_ENV === 'production'),
       resources,
     });
